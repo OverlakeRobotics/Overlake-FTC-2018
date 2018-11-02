@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -31,12 +30,9 @@ public class VuforiaDetection extends LinearOpMode {
     private static final float mmPerInch        = 25.4f;
     private static final float mmFTCFieldWidth  = (12*6) * mmPerInch;       // the width of the FTC field (from the center point to the outer panels)
     private static final float mmTargetHeight   = (6) * mmPerInch;
-
-    ElapsedTime elapsedTime = new ElapsedTime();
+    
     @Override
     public void runOpMode() throws InterruptedException {
-
-        elapsedTime.reset();
 
         boolean targetVisible = false;
         final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = VuforiaLocalizer.CameraDirection.BACK;
