@@ -23,7 +23,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
 
     private ConfigParser config;
 
-    private double TICKS_TO_INCHES;
+    private double TICKS_IN_INCH;
+    private double TICKS_IN_INCH_STRAFE;
     private final IScale JOYSTICK_SCALE = new LinearScale(0.62, 0);
     private static double TURN_RAMP_POWER_CUTOFF = 0.1;
     private static double RAMP_POWER_CUTOFF;
@@ -39,7 +40,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         super(opMode, "MecanumDrive");
 
         //this.config = new ConfigParser("Testy.omc");
-        TICKS_TO_INCHES = 69;
+        TICKS_IN_INCH = 69;
+        TICKS_IN_INCH_STRAFE = 69;
         RAMP_POWER_CUTOFF = 0.3;
 
         imuSystem = new IMUSystem(opMode);
@@ -49,11 +51,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         telemetry.log("MecanumDriveSystem","distance: {0}", 0);
     }
 
-    private void telem(String message) {
-        telemetry.log("MecanumDriveSystem", message);
-        telemetry.write();
-    }
-
+    // test
     public void mecanumDrive(float rightX, float rightY, float leftX, float leftY, boolean slowDrive) {
         rightX = Range.clip(rightX, -1, 1);
         leftX = Range.clip(leftX, -1, 1);
@@ -64,9 +62,14 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         leftY = scaleJoystickValue(leftY);
 
         // write the values to the motors
-        double frontRightPower = leftY + leftX - rightX;
+        /*double frontRightPower = leftY + leftX - rightX;
         double backRightPower = leftY - leftX - rightX;
         double frontLeftPower = leftY - leftX + rightX;
+        double backLeftPower = leftY + leftX + rightX;*/
+
+        double frontRightPower = leftY + leftX - rightX;
+        double backRightPower = -leftY + leftX - rightX;
+        double frontLeftPower = -leftY + leftX + rightX;
         double backLeftPower = leftY + leftX + rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
@@ -86,6 +89,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
                 : (float)-JOYSTICK_SCALE.scaleX(joystickValue * joystickValue);
     }
 
+    // test
     public void driveGodMode(float rightX, float rightY, float leftX, float leftY) {
         driveGodMode(rightX, rightY, leftX, leftY, 1);
     }
@@ -132,6 +136,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         }
     }
 
+    // test
     public void mecanumDriveXY(double x, double y) {
         this.motorFrontRight.setPower(Range.clip(y + x, -1, 1));
         this.motorBackRight.setPower(Range.clip(y - x, -1, 1));
@@ -139,23 +144,44 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         this.motorBackLeft.setPower(Range.clip(y + x, -1, 1));
     }
 
+    // test
     public void mecanumDrivePolar(double radians, double power) {
         double x = Math.cos(radians) * power;
         double y = Math.sin(radians) * power;
         mecanumDriveXY(x, y);
     }
 
+    // test
     public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
+        setDirection(DriveDirection.FOREWARD);
+        driveToPositionTicks(ticks, power);
+    }
+
+    // test
+    public void strafeLeftToPositionInches(int inches, double power) {
+        setDirection(DriveDirection.STRAFE_LEFT);
+        int ticks = (int) inchesToTicksStrafe(inches);
+        driveToPositionTicks(ticks, power);
+    }
+
+    // test
+    public void strafeRightToPositionInches(int inches, double power) {
+        setDirection(DriveDirection.STRAFE_RIGHT);
+        int ticks = (int) inchesToTicksStrafe(inches);
+        driveToPositionTicks(ticks, power);
+    }
+
+    public void driveToPositionTicks(int ticks, double power) {
         motorBackRight.setPower(0);
         motorBackLeft.setPower(0);
         motorFrontLeft.setPower(0);
         motorFrontRight.setPower(0);
 
-        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        /*motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);*/
 
         motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
         motorFrontLeft.setTargetPosition(motorFrontLeft.getCurrentPosition() + ticks);
@@ -223,12 +249,13 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         return d;
     }
 
-    private double ticksToInches(int ticks) {
-        return ticks / TICKS_TO_INCHES;
+    private double inchesToTicks(int inches) {
+        return inches * TICKS_IN_INCH;
     }
 
-    private double inchesToTicks(int ticks) {
-        return ticks * TICKS_TO_INCHES;
+    // test
+    private double inchesToTicksStrafe(int inches) {
+        return inches * TICKS_IN_INCH_STRAFE;
     }
 
     private int min(int d1, int d2) {
@@ -278,6 +305,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         this.setPower(0);
     }
 
+    // test
     public void tankDrive(double leftPower, double rightPower) {
         double FLpower = leftPower;
         double BLpower = - leftPower;
@@ -297,6 +325,95 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         return targetHeading - heading;
     }
 
+    ////////// STUFF THAT NEEDS TESTO ////////////
+
+    public void parkOnCrater(double maxPower) {
+        double initPitch = imuSystem.getpitch();
+        double initRoll = imuSystem.getRoll();
+        double tolerance = 1.5;
+
+        setPower(maxPower);
+
+        while ((Math.abs(imuSystem.getpitch() - initPitch) < tolerance) &&
+                (Math.abs(imuSystem.getRoll() - initRoll) < tolerance)) {
+            setPower(maxPower);
+        }
+
+        setPower(0);
+    }
+
+    public void testDirection(DriveDirection direction, LinearOpMode l) {
+        telemetry.log("Testing Direction: ", direction);
+        telemetry.write();
+        setDirection(direction);
+        setPower(1);
+        l.sleep(2000);
+        setPower(0);
+    }
+
+    public void driveToPoInches(int inches, double power) {
+        int ticks = (int) inchesToTicks(inches);
+        setPower(0);
+
+        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
+        motorFrontLeft.setTargetPosition(motorFrontLeft.getCurrentPosition() + ticks);
+        motorBackRight.setTargetPosition(motorBackRight.getCurrentPosition() + ticks);
+        motorBackLeft.setTargetPosition(motorBackLeft.getCurrentPosition() + ticks);
+
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
+                new Point((ticks / 4), power));
+
+        double adjustedPower = Range.clip(power, -1.0, 1.0);
+
+        setPower(adjustedPower);
+
+        while (motorFrontLeft.isBusy() ||
+                motorFrontRight.isBusy() ||
+                motorBackRight.isBusy() ||
+                motorBackLeft.isBusy()) {
+
+            int distance = getMinDistanceFromTarget();
+
+            if (distance < 50) {
+                break;
+            }
+
+            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + this.motorFrontLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + this.motorFrontRight.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + this.motorBackLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + this.motorBackRight.getTargetPosition());
+
+            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + this.motorFrontLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + this.motorFrontRight.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + this.motorBackLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + this.motorBackRight.getCurrentPosition());
+
+            double direction = 1.0;
+            if (distance < 0) {
+                distance = -distance;
+                direction = -1.0;
+            }
+
+            double scaledPower = ramp.scaleX(distance);
+            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
+            setPower(direction * scaledPower);
+            telemetry.write();
+        }
+        setPower(0);
+    }
+
+    ////////// STUFF THAT MAYBE SHOULDNT BE HERE //////////
+
     private double getTurnPower(Ramp ramp, double targetHeading, double heading) {
         double diff = computeDegreesDiff(targetHeading, heading);
 
@@ -307,28 +424,5 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         }
     }
 
-    public void parkOnCrater(double maxPower) {
-        double initPitch = imuSystem.getPitch();
-        double initRoll = imuSystem.getRoll();
-        double tolerance = 1.5;
 
-        setPower(1);
-
-        while ((Math.abs(imuSystem.getPitch() - initPitch) < tolerance) &&
-                (Math.abs(imuSystem.getRoll() - initRoll) < tolerance)) {
-            setPower(1);
-        }
-    }
-
-    public void driveUntilCriticalAngle(double power, double criticalAngle) {
-        setPower(0);
-        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        double adjustedPower = Range.clip(power, -1.0, 1.0);
-        setPower(adjustedPower);
-
-        while (imuSystem.getPitch() + imuSystem.getRoll() < criticalAngle) {}
-
-        setPower(0);
-    }
 }
