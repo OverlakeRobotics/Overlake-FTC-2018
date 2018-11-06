@@ -38,12 +38,12 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
     public MecanumDriveSystem(OpMode opMode) {
         super(opMode, "MecanumDrive");
 
-        this.config = new ConfigParser("Testy.omc");
-        TICKS_TO_INCHES = config.getInt("ticksInInch");
-        RAMP_POWER_CUTOFF = config.getDouble("rampPowerCutoff");
+        //this.config = new ConfigParser("Testy.omc");
+        TICKS_TO_INCHES = 67;
+        RAMP_POWER_CUTOFF = 0.3;
 
         imuSystem = new IMUSystem(opMode);
-        initialHeading = Math.toRadians(imuSystem.getHeading());
+        initialHeading = imuSystem.getHeading();
 
         telemetry.log("MecanumDriveSystem","power: {0}", 0);
         telemetry.log("MecanumDriveSystem","distance: {0}", 0);
@@ -145,6 +145,58 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         mecanumDriveXY(x, y);
     }
 
+    public void driveToPoShortt(int inches, double power) {
+        int ticks = (int) inchesToTicks(inches);
+        setPower(0);
+
+        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
+
+        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
+                new Point((ticks / 4), power));
+
+        double adjustedPower = Range.clip(power, -1.0, 1.0);
+
+        setPower(adjustedPower);
+
+        while (anyMotorsBusy()) {
+
+            int distance = getMinDistanceFromTarget();
+
+            if (distance < 50) {
+                break;
+            }
+
+            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + this.motorFrontLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + this.motorFrontRight.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + this.motorBackLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + this.motorBackRight.getTargetPosition());
+
+            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + this.motorFrontLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + this.motorFrontRight.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + this.motorBackLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + this.motorBackRight.getCurrentPosition());
+
+            double direction = 1.0;
+            if (distance < 0) {
+                distance = -distance;
+                direction = -1.0;
+            }
+
+            double scaledPower = ramp.scaleX(distance);
+            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
+            setPower(direction * scaledPower);
+            telemetry.write();
+        }
+        setPower(0);
+    }
+
     public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
         motorBackRight.setPower(0);
@@ -168,7 +220,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
-                new Point((ticks / config.getInt("rampStartDivisor")), power));
+                new Point((ticks / 4), power));
 
         double adjustedPower = Range.clip(power, -1.0, 1.0);
 
@@ -184,7 +236,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
 
             int distance = getMinDistanceFromTarget();
 
-            if (distance < config.getInt("tolerance")) {
+            if (distance < 50) {
                 break;
             }
 
@@ -231,7 +283,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         return ticks * TICKS_TO_INCHES;
     }
 
-
     private int min(int d1, int d2) {
         if (d1 < d2) {
             return d1;
@@ -240,9 +291,17 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         }
     }
 
-    public void turn(double degrees, double maxPower) {
+    public void turnAbsolute(double degrees, double maxPower) {
+        turn(degrees, maxPower, initialHeading);
+    }
 
-        double heading = -imuSystem.getHeading();
+    public void turn(double degrees, double maxPower) {
+        turn(degrees, maxPower, imuSystem.getHeading());
+    }
+
+    private void turn(double degrees, double maxPower, double initialHeading) {
+
+        double heading = -initialHeading;
         double targetHeading = 0;
 
         if ((degrees % 360) > 180) {

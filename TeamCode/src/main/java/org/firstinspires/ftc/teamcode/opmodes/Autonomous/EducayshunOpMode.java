@@ -32,7 +32,11 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         //telem("About to drive to position inches 20000 ticks at power 1");
         //driveSystem.driveToPositionInches(20000, 1);
 
-        driveSystem.driveToPositionInches(15, 1);
+        driveSystem.driveToPositionInches(30, 1);
+
+        telem("just drovetopositioninches 30. about to drivetoposshortt 30");
+
+        driveSystem.driveToPoShortt(30, 1);
 
         // FR BL BR FL
 
@@ -46,6 +50,6 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
     private void telem(String message) {
         telemetry.addLine(message);
         telemetry.update();
-        sleep(250);
+        sleep(3000);
     }
 }
