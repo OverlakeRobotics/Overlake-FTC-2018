@@ -39,7 +39,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         super(opMode, "MecanumDrive");
 
         //this.config = new ConfigParser("Testy.omc");
-        TICKS_TO_INCHES = 67;
+        TICKS_TO_INCHES = 69;
         RAMP_POWER_CUTOFF = 0.3;
 
         imuSystem = new IMUSystem(opMode);
@@ -143,58 +143,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         double x = Math.cos(radians) * power;
         double y = Math.sin(radians) * power;
         mecanumDriveXY(x, y);
-    }
-
-    public void driveToPoShortt(int inches, double power) {
-        int ticks = (int) inchesToTicks(inches);
-        setPower(0);
-
-        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
-
-        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
-                new Point((ticks / 4), power));
-
-        double adjustedPower = Range.clip(power, -1.0, 1.0);
-
-        setPower(adjustedPower);
-
-        while (anyMotorsBusy()) {
-
-            int distance = getMinDistanceFromTarget();
-
-            if (distance < 50) {
-                break;
-            }
-
-            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + this.motorFrontLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + this.motorFrontRight.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + this.motorBackLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + this.motorBackRight.getTargetPosition());
-
-            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + this.motorFrontLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + this.motorFrontRight.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + this.motorBackLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + this.motorBackRight.getCurrentPosition());
-
-            double direction = 1.0;
-            if (distance < 0) {
-                distance = -distance;
-                direction = -1.0;
-            }
-
-            double scaledPower = ramp.scaleX(distance);
-            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
-            setPower(direction * scaledPower);
-            telemetry.write();
-        }
-        setPower(0);
     }
 
     public void driveToPositionInches(int inches, double power) {
@@ -331,10 +279,18 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
     }
 
     public void tankDrive(double leftPower, double rightPower) {
-        this.motorFrontLeft.setPower(leftPower);
-        this.motorBackLeft.setPower(leftPower);
-        this.motorFrontRight.setPower(rightPower);
-        this.motorBackRight.setPower(rightPower);
+        double FLpower = leftPower;
+        double BLpower = - leftPower;
+        double FRpower = -rightPower;
+        double BRpower = rightPower;
+        telemetry.log("FLpower: ", FLpower);
+        telemetry.log("BLpower: ", BLpower);
+        telemetry.log("FRpower: ", FRpower);
+        telemetry.log("BRpower: ", BRpower);
+        this.motorFrontLeft.setPower(FLpower);
+        this.motorBackLeft.setPower(BLpower);
+        this.motorFrontRight.setPower(FRpower);
+        this.motorBackRight.setPower(BRpower);
     }
 
     private double computeDegreesDiff(double targetHeading, double heading) {
@@ -349,5 +305,20 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         } else {
             return ramp.scaleX(Math.abs(diff));
         }
+    }
+
+    public void parkOnCrater(double maxPower) {
+        double initPitch = imuSystem.getpitch();
+        double initRoll = imuSystem.getRoll();
+        double tolerance = 1.5;
+
+        setPower(1);
+
+        while ((Math.abs(imuSystem.getpitch() - initPitch) < tolerance) &&
+                (Math.abs(imuSystem.getRoll() - initRoll) < tolerance)) {
+            setPower(1);
+        }
+
+        setPower(0);
     }
 }

@@ -32,11 +32,17 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         //telem("About to drive to position inches 20000 ticks at power 1");
         //driveSystem.driveToPositionInches(20000, 1);
 
-        driveSystem.driveToPositionInches(30, 1);
+        driveSystem.driveToPositionInches(15, 1);
 
-        telem("just drovetopositioninches 30. about to drivetoposshortt 30");
+        telem("about to turn 90");
 
-        driveSystem.driveToPoShortt(30, 1);
+        driveSystem.turn(90, 1);
+
+        telem("about turn abosolute 180");
+
+        driveSystem.turnAbsolute(180, 1);
+
+        telem("about to turn aboslute 90");
 
         // FR BL BR FL
 
