@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.systems;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -145,7 +143,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
 
     public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
-        setDirection(DriveDirection.FOREWARD);
+        setDirection(DriveDirection.FORWARD);
         driveToPositionTicks(ticks, power);
     }
 

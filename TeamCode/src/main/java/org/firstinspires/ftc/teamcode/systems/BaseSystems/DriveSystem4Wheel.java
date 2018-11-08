@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.components.Motors.DriveMotor;
-
 public class DriveSystem4Wheel extends System {
 
     public DcMotor motorFrontLeft;
@@ -21,7 +19,7 @@ public class DriveSystem4Wheel extends System {
         this.motorBackRight = hardwareMap.dcMotor.get("motorBR");
         this.motorBackLeft = hardwareMap.dcMotor.get("motorBL");
 
-        setDirection(DriveDirection.FOREWARD);
+        setDirection(DriveDirection.FORWARD);
 
         this.motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -69,7 +67,7 @@ public class DriveSystem4Wheel extends System {
 
     public void setDirection(DriveDirection direction) {
         switch (direction){
-            case FOREWARD:
+            case FORWARD:
                 motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -97,6 +95,6 @@ public class DriveSystem4Wheel extends System {
     }
 
     public enum DriveDirection {
-        FOREWARD, BACKWARD, STRAFE_LEFT, STRAFE_RIGHT;
+        FORWARD, BACKWARD, STRAFE_LEFT, STRAFE_RIGHT;
     }
 }
