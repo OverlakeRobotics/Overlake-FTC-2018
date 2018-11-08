@@ -51,7 +51,7 @@ public class IMUSystem extends System {
         return orientation.secondAngle;
     }
 
-    public double getpitch() {
+    public double getPitch() {
         Orientation orientation = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         return orientation.thirdAngle;
     }
