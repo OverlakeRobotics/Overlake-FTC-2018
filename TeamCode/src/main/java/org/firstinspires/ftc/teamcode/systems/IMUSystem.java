@@ -35,6 +35,8 @@ public class IMUSystem extends System {
         this.imu = this.hardwareMap.get(BNO055IMU.class, "imu");
         this.imu.initialize(parameters);
 
+
+
         // Enable reporting of position using the naive integrator
         imu.startAccelerationIntegration(new Position(), new Velocity(), 500);
     }
@@ -49,7 +51,7 @@ public class IMUSystem extends System {
         return orientation.secondAngle;
     }
 
-    public double getPitch() {
+    public double getpitch() {
         Orientation orientation = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         return orientation.thirdAngle;
     }

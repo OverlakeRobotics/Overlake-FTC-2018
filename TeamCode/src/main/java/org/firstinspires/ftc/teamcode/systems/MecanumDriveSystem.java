@@ -61,16 +61,11 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         leftX = scaleJoystickValue(leftX);
         leftY = scaleJoystickValue(leftY);
 
-        // write the values to the motors
-        /*double frontRightPower = leftY + leftX - rightX;
-        double backRightPower = leftY - leftX - rightX;
-        double frontLeftPower = leftY - leftX + rightX;
-        double backLeftPower = leftY + leftX + rightX;*/
-
-        double frontRightPower = leftY + leftX - rightX;
-        double backRightPower = -leftY + leftX - rightX;
-        double frontLeftPower = -leftY + leftX + rightX;
-        double backLeftPower = leftY + leftX + rightX;
+        // write the values to the motors 1
+        double frontRightPower = leftY + leftX + rightX;
+        double backRightPower = -leftY + leftX + rightX;
+        double frontLeftPower = -leftY + leftX - rightX;
+        double backLeftPower = leftY + leftX - rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
         telemetry.log("Mecanum Drive System","FRpower: {0}", Range.clip(frontRightPower, -1, 1));
@@ -89,7 +84,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
                 : (float)-JOYSTICK_SCALE.scaleX(joystickValue * joystickValue);
     }
 
-    // test
     public void driveGodMode(float rightX, float rightY, float leftX, float leftY) {
         driveGodMode(rightX, rightY, leftX, leftY, 1);
     }
@@ -136,7 +130,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         }
     }
 
-    // test
     public void mecanumDriveXY(double x, double y) {
         this.motorFrontRight.setPower(Range.clip(y + x, -1, 1));
         this.motorBackRight.setPower(Range.clip(y - x, -1, 1));
@@ -144,44 +137,35 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         this.motorBackLeft.setPower(Range.clip(y + x, -1, 1));
     }
 
-    // test
     public void mecanumDrivePolar(double radians, double power) {
         double x = Math.cos(radians) * power;
         double y = Math.sin(radians) * power;
         mecanumDriveXY(x, y);
     }
 
-    // test
     public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
         setDirection(DriveDirection.FOREWARD);
         driveToPositionTicks(ticks, power);
     }
 
-    // test
     public void strafeLeftToPositionInches(int inches, double power) {
         setDirection(DriveDirection.STRAFE_LEFT);
         int ticks = (int) inchesToTicksStrafe(inches);
         driveToPositionTicks(ticks, power);
     }
 
-    // test
     public void strafeRightToPositionInches(int inches, double power) {
         setDirection(DriveDirection.STRAFE_RIGHT);
         int ticks = (int) inchesToTicksStrafe(inches);
         driveToPositionTicks(ticks, power);
     }
 
-    public void driveToPositionTicks(int ticks, double power) {
+    private void driveToPositionTicks(int ticks, double power) {
         motorBackRight.setPower(0);
         motorBackLeft.setPower(0);
         motorFrontLeft.setPower(0);
         motorFrontRight.setPower(0);
-
-        /*motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);*/
 
         motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
         motorFrontLeft.setTargetPosition(motorFrontLeft.getCurrentPosition() + ticks);
@@ -253,7 +237,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         return inches * TICKS_IN_INCH;
     }
 
-    // test
     private double inchesToTicksStrafe(int inches) {
         return inches * TICKS_IN_INCH_STRAFE;
     }
@@ -305,20 +288,21 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         this.setPower(0);
     }
 
-    // test
+    private double getTurnPower(Ramp ramp, double targetHeading, double heading) {
+        double diff = computeDegreesDiff(targetHeading, heading);
+
+        if (diff < 0) {
+            return -ramp.scaleX(Math.abs(diff));
+        } else {
+            return ramp.scaleX(Math.abs(diff));
+        }
+    }
+    
     public void tankDrive(double leftPower, double rightPower) {
-        double FLpower = leftPower;
-        double BLpower = - leftPower;
-        double FRpower = -rightPower;
-        double BRpower = rightPower;
-        telemetry.log("FLpower: ", FLpower);
-        telemetry.log("BLpower: ", BLpower);
-        telemetry.log("FRpower: ", FRpower);
-        telemetry.log("BRpower: ", BRpower);
-        this.motorFrontLeft.setPower(FLpower);
-        this.motorBackLeft.setPower(BLpower);
-        this.motorFrontRight.setPower(FRpower);
-        this.motorBackRight.setPower(BRpower);
+        this.motorFrontLeft.setPower(-leftPower);
+        this.motorBackLeft.setPower(leftPower);
+        this.motorFrontRight.setPower(rightPower);
+        this.motorBackRight.setPower(-rightPower);
     }
 
     private double computeDegreesDiff(double targetHeading, double heading) {
@@ -341,88 +325,4 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
 
         setPower(0);
     }
-
-    public void testDirection(DriveDirection direction, LinearOpMode l) {
-        telemetry.log("Testing Direction: ", direction);
-        telemetry.write();
-        setDirection(direction);
-        setPower(1);
-        l.sleep(2000);
-        setPower(0);
-    }
-
-    public void driveToPoInches(int inches, double power) {
-        int ticks = (int) inchesToTicks(inches);
-        setPower(0);
-
-        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
-        motorFrontLeft.setTargetPosition(motorFrontLeft.getCurrentPosition() + ticks);
-        motorBackRight.setTargetPosition(motorBackRight.getCurrentPosition() + ticks);
-        motorBackLeft.setTargetPosition(motorBackLeft.getCurrentPosition() + ticks);
-
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
-                new Point((ticks / 4), power));
-
-        double adjustedPower = Range.clip(power, -1.0, 1.0);
-
-        setPower(adjustedPower);
-
-        while (motorFrontLeft.isBusy() ||
-                motorFrontRight.isBusy() ||
-                motorBackRight.isBusy() ||
-                motorBackLeft.isBusy()) {
-
-            int distance = getMinDistanceFromTarget();
-
-            if (distance < 50) {
-                break;
-            }
-
-            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + this.motorFrontLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + this.motorFrontRight.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + this.motorBackLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + this.motorBackRight.getTargetPosition());
-
-            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + this.motorFrontLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + this.motorFrontRight.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + this.motorBackLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + this.motorBackRight.getCurrentPosition());
-
-            double direction = 1.0;
-            if (distance < 0) {
-                distance = -distance;
-                direction = -1.0;
-            }
-
-            double scaledPower = ramp.scaleX(distance);
-            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
-            setPower(direction * scaledPower);
-            telemetry.write();
-        }
-        setPower(0);
-    }
-
-    ////////// STUFF THAT MAYBE SHOULDNT BE HERE //////////
-
-    private double getTurnPower(Ramp ramp, double targetHeading, double heading) {
-        double diff = computeDegreesDiff(targetHeading, heading);
-
-        if (diff < 0) {
-            return -ramp.scaleX(Math.abs(diff));
-        } else {
-            return ramp.scaleX(Math.abs(diff));
-        }
-    }
-
-
 }

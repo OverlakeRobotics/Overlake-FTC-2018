@@ -82,10 +82,16 @@ public class DriveSystem4Wheel extends System {
                 motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 break;
             case STRAFE_LEFT:
-
+                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
             case STRAFE_RIGHT:
-
+                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 break;
         }
     }

@@ -23,8 +23,9 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         waitForStart();
         ////
 
-        driveSystem.testDirection(DriveSystem4Wheel.DriveDirection.FOREWARD, this);
-        driveSystem.testDirection(DriveSystem4Wheel.DriveDirection.BACKWARD, this);
+        driveSystem.driveToPositionInches(30, 1);
+        sleep(3000);
+        driveSystem.strafeLeftToPositionInches(30, 1);
 
         // FR BL BR FL
 
