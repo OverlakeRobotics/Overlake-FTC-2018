@@ -314,9 +314,11 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
 
         setDirection(DriveDirection.FORWARD);
         setPower(maxPower);
+
         while ((Math.abs(imuSystem.getPitch() - initPitch) < criticalAngle) &&
                 (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle)) {
             setPower(maxPower);
         }
+        setPower(0);
     }
 }
