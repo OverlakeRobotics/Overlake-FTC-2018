@@ -23,9 +23,7 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         waitForStart();
         ////
 
-        driveSystem.driveToPositionInches(30, 1);
-        sleep(3000);
-        driveSystem.strafeLeftToPositionInches(30, 1);
+        driveSystem.parkOnCrater(0.8);
 
         // FR BL BR FL
 

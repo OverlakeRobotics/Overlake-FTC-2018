@@ -307,16 +307,16 @@ public class MecanumDriveSystem extends DriveSystem4Wheel {
         return targetHeading - heading;
     }
 
-    // TODO: test this function
-    public void driveUntilCriticalAngle(double power, double criticalAngle) {
-        setPower(0);
-        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    public void parkOnCrater(double maxPower) {
+        double initPitch = imuSystem.getPitch();
+        double initRoll = imuSystem.getRoll();
+        double criticalAngle = 1.5;
 
-        double adjustedPower = Range.clip(power, -1.0, 1.0);
-        setPower(adjustedPower);
-
-        while (Math.abs(imuSystem.getPitch()) + Math.abs(imuSystem.getRoll()) < criticalAngle) {}
-
-        setPower(0);
+        setDirection(DriveDirection.FORWARD);
+        setPower(maxPower);
+        while ((Math.abs(imuSystem.getPitch() - initPitch) < criticalAngle) &&
+                (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle)) {
+            setPower(maxPower);
+        }
     }
 }
