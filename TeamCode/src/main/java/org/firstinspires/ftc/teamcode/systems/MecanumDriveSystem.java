@@ -215,6 +215,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
             double scaledPower = ramp.scaleX(distance);
             telemetry.log("MecanumDriveSystem","power: " + scaledPower);
             setPower(direction * scaledPower);
+            telemetry.log("MecanumDriveSystem","power motorFL: " + this.motorFrontLeft.getPower());
+            telemetry.log("MecanumDriveSystem","power motorFR: " + this.motorFrontRight.getPower());
+            telemetry.log("MecanumDriveSystem","power motorBL: " + this.motorBackLeft.getPower());
+            telemetry.log("MecanumDriveSystem","power motorBR: " + this.motorBackRight.getPower());
             telemetry.write();
         }
         motorBackLeft.setPower(0);

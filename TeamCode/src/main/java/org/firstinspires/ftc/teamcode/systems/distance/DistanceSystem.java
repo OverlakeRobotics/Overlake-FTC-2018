@@ -35,99 +35,6 @@ public class DistanceSystem extends System {
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)lidar;
     }
 
-    public void driveToPositionSetUp(int ticks) {
-        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
-
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
-
-        driveSystem.motorFrontRight.setTargetPosition(driveSystem.motorFrontRight.getCurrentPosition() + ticks);
-        driveSystem.motorFrontLeft.setTargetPosition(driveSystem.motorFrontLeft.getCurrentPosition() + ticks);
-        driveSystem.motorBackRight.setTargetPosition(driveSystem.motorBackRight.getCurrentPosition() + ticks);
-        driveSystem.motorBackLeft.setTargetPosition(driveSystem.motorBackLeft.getCurrentPosition() + ticks);
-
-        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-    public void driveAlongWallInches(int inches, double displacement, double power) {
-        // this method assumes both sensors can see the wall
-        // run with encoders as if running to position
-        // take sensor data (displacement and rotation) and scale it into a joystick-like value from 0-1
-        // instead of setPower() use the mechanum drive scheme to set the power
-        // write the values to the motors 1
-
-
-
-
-
-
-        int ticks = (int) driveSystem.inchesToTicks(inches);
-        driveToPositionSetUp(ticks);
-
-        Ramp rampY = new ExponentialRamp(new Point(0, driveSystem.RAMP_POWER_CUTOFF),
-                new Point((ticks / 4), power));
-
-        Ramp rampX = new ExponentialRamp(new Point(0, 0.05),
-                new Point((displacement / 4), (power / 2)));
-
-        double adjustedPower = Range.clip(power, -1.0, 1.0);
-
-        driveSystem.motorBackRight.setPower(adjustedPower);
-        driveSystem.motorBackLeft.setPower(adjustedPower);
-        driveSystem.motorFrontLeft.setPower(adjustedPower);
-        driveSystem.motorFrontRight.setPower(adjustedPower);
-
-        double frontRightPower = adjustedPower;
-        double backRightPower = adjustedPower;
-        double frontLeftPower = adjustedPower;
-        double backLeftPower = adjustedPower;
-
-        while (driveSystem.motorFrontLeft.isBusy() ||
-                driveSystem.motorFrontRight.isBusy() ||
-                driveSystem.motorBackRight.isBusy() ||
-                driveSystem.motorBackLeft.isBusy()) {
-
-            double leftPower = power;
-            double RightPower = power;
-
-
-            int distance = driveSystem.getMinDistanceFromTarget();
-            double displacement2 = getFrontRightDistance();
-
-            if (distance < 50) {
-                break;
-            }
-
-            double directionY = 1.0;
-            if (distance < 0) {
-                distance = -distance;
-                directionY = -1.0;
-            }
-
-            double directionX = 1.0;
-            if (distance < 0) {
-                distance = -distance;
-                directionX = -1.0;
-            }
-
-            double scaledPowerY = directionY * rampY.scaleX(distance);
-            double scaledPowerX = directionX * rampX.scaleX(displacement2);
-            telemetry.log("MecanumDriveSystem","powerY: " + scaledPowerY);
-            telemetry.log("MecanumDriveSystem","powerX: " + scaledPowerX);
-            driveSystem.mecanumDrive(/*turnPower*/(float) scaledPowerX, 0, 0, (float) scaledPowerY, false);
-            telemetry.write();
-        }
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
-    }
-
     public void driveToDoiiiiiii(int inches, int displacement, double power) {
         int ticks = (int) driveSystem.inchesToTicks(inches);
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
@@ -249,6 +156,72 @@ public class DistanceSystem extends System {
         telemetry.write();
     }
 
+    private void findpower(int displacement, double power) {
+        Ramp rampX = new ExponentialRamp(new Point(0, 0.05),
+                new Point((displacement / 4), (power / 2)));
+
+        double d1 = getDistance1();
+        double displacementDiff = displacement - d1;
+
+        double directionX = 1.0;
+        if (displacementDiff < 0) {
+            displacementDiff = -displacementDiff;
+            directionX = -1.0;
+        }
+
+        double scaledPowerX = directionX * rampX.scaleX(displacementDiff);
+
+        telemetry.log("corrective power right: ", scaledPowerX);
+        telemetry.write();
+    }
+
+    public void findpower2(int displacement, double power) {
+        Ramp rampX = new ExponentialRamp(new Point(0, 0.05),
+                new Point((displacement / 4), (power / 2)));
+
+        double d1 = getDistanceTopRight();
+        telemetry.log("calculated distance", "" + d1);
+        double displacementDiff = displacement - d1;
+
+        double directionX = 1.0;
+        if (displacementDiff < 0) {
+            displacementDiff = -displacementDiff;
+            directionX = -1.0;
+        }
+
+        double scaledPowerX = directionX * rampX.scaleX(displacementDiff);
+
+        telemetry.log("corrective power right: ", "" + scaledPowerX);
+        telemetry.write();
+    }
+
+    public double getDistanceTopRight() {
+        double d1 = getDistance1();
+        double d2 = getDistance2();
+        double df = d1 - d2;
+        double ds = 10.0; // inches
+        double d = (d1 * (Math.sin(Math.atan((ds/df)))));
+        return d;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private double getXPower() {
         int displacement = 12;
         double power = 1.0;
@@ -264,5 +237,93 @@ public class DistanceSystem extends System {
         }
         double scaledPowerX = directionX * rampX.scaleX(displacementDiff);
         return scaledPowerX;
+    }
+
+    public void driveToPositionSetUp(int ticks) {
+        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+
+        driveSystem.motorFrontRight.setTargetPosition(driveSystem.motorFrontRight.getCurrentPosition() + ticks);
+        driveSystem.motorFrontLeft.setTargetPosition(driveSystem.motorFrontLeft.getCurrentPosition() + ticks);
+        driveSystem.motorBackRight.setTargetPosition(driveSystem.motorBackRight.getCurrentPosition() + ticks);
+        driveSystem.motorBackLeft.setTargetPosition(driveSystem.motorBackLeft.getCurrentPosition() + ticks);
+
+        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void driveAlongWallInches(int inches, double displacement, double power) {
+        // this method assumes both sensors can see the wall
+        // run with encoders as if running to position
+        // take sensor data (displacement and rotation) and scale it into a joystick-like value from 0-1
+        // instead of setPower() use the mechanum drive scheme to set the power
+        // write the values to the motors 1
+
+        int ticks = (int) driveSystem.inchesToTicks(inches);
+        driveToPositionSetUp(ticks);
+
+        Ramp rampY = new ExponentialRamp(new Point(0, driveSystem.RAMP_POWER_CUTOFF),
+                new Point((ticks / 4), power));
+
+        Ramp rampX = new ExponentialRamp(new Point(0, 0.05),
+                new Point((displacement / 4), (power / 2)));
+
+        double adjustedPower = Range.clip(power, -1.0, 1.0);
+
+        driveSystem.motorBackRight.setPower(adjustedPower);
+        driveSystem.motorBackLeft.setPower(adjustedPower);
+        driveSystem.motorFrontLeft.setPower(adjustedPower);
+        driveSystem.motorFrontRight.setPower(adjustedPower);
+
+        double frontRightPower = adjustedPower;
+        double backRightPower = adjustedPower;
+        double frontLeftPower = adjustedPower;
+        double backLeftPower = adjustedPower;
+
+        while (driveSystem.motorFrontLeft.isBusy() ||
+                driveSystem.motorFrontRight.isBusy() ||
+                driveSystem.motorBackRight.isBusy() ||
+                driveSystem.motorBackLeft.isBusy()) {
+
+            double leftPower = power;
+            double RightPower = power;
+
+
+            int distance = driveSystem.getMinDistanceFromTarget();
+            double displacement2 = getFrontRightDistance();
+
+            if (distance < 50) {
+                break;
+            }
+
+            double directionY = 1.0;
+            if (distance < 0) {
+                distance = -distance;
+                directionY = -1.0;
+            }
+
+            double directionX = 1.0;
+            if (distance < 0) {
+                distance = -distance;
+                directionX = -1.0;
+            }
+
+            double scaledPowerY = directionY * rampY.scaleX(distance);
+            double scaledPowerX = directionX * rampX.scaleX(displacement2);
+            telemetry.log("MecanumDriveSystem","powerY: " + scaledPowerY);
+            telemetry.log("MecanumDriveSystem","powerX: " + scaledPowerX);
+            driveSystem.mecanumDrive(/*turnPower*/(float) scaledPowerX, 0, 0, (float) scaledPowerY, false);
+            telemetry.write();
+        }
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
     }
 }
