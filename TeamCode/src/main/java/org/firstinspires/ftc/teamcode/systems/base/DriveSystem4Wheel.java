@@ -75,10 +75,10 @@ public class DriveSystem4Wheel extends System
     }
 
     public void tankDrive(double leftPower, double rightPower) {
-        this.motorFrontLeft.setPower(-leftPower);
+        this.motorFrontLeft.setPower(leftPower);
         this.motorBackLeft.setPower(leftPower);
         this.motorFrontRight.setPower(rightPower);
-        this.motorBackRight.setPower(-rightPower);
+        this.motorBackRight.setPower(rightPower);
     }
 
     public void setDirection(DriveDirection direction) {
@@ -95,10 +95,16 @@ public class DriveSystem4Wheel extends System
                 motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 break;
+            case TURN:
+                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                break;
         }
     }
 
     public enum DriveDirection {
-        FORWARD, BACKWARD;
+        FORWARD, BACKWARD, TURN;
     }
 }

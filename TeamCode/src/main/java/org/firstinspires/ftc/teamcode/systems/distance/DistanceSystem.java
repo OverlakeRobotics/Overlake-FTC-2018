@@ -245,24 +245,36 @@ public class DistanceSystem extends System {
 
                 driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 driveSystem.setPower(0);
-
-                double turnDirection = 1.0;
-                if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
-                    telemetry.log("driveTest", "turning RIGHT");
-                    turnDirection = -1.0;
-                } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
-                    telemetry.log("driveTest", "turning LEFT");
-                    turnDirection = 1.0;
-                }
-                double tankPower = (turnDirection * (power / 2));
                 
                 while ((getDistance1() >= farBuffer) ||
                         (getDistance2() >= farBuffer) ||
                         (getDistance1() <= closeBuffer) ||
                         (getDistance2() <= closeBuffer)) {
+
+                    double turnDirection = 1.0;
+                    if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
+                        telemetry.log("driveTest", "turning RIGHT");
+                        turnDirection = -1.0;
+                    } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
+                        telemetry.log("driveTest", "turning LEFT");
+                        turnDirection = 1.0;
+                    }
+                    double tankPower = (turnDirection * (power / 2));
+
                     telemetry.log("driveTest", "looping correction R-power: " + tankPower);
 
+                    telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
+                    telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
+                    telemetry.log("MecanumDriveSystem","power motorBL: " + driveSystem.motorBackLeft.getPower());
+                    telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
+                    telemetry.write();
+
                     driveSystem.tankDrive(-tankPower, tankPower);
+
+                    //driveSystem.motorBackRight.setPower(tankPower);
+                    //driveSystem.motorBackLeft.setPower(-tankPower);
+                    //driveSystem.motorFrontLeft.setPower(-tankPower);
+                    //driveSystem.motorFrontRight.setPower(tankPower);
 
                 }
                 driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
