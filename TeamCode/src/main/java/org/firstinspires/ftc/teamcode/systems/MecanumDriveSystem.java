@@ -24,8 +24,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     private ConfigParser config;
 
-    public double TICKS_IN_INCH;
-    public double TICKS_IN_INCH_STRAFE;
+    public int TICKS_IN_INCH;
+    public int TICKS_IN_INCH_STRAFE;
     private final IScale JOYSTICK_SCALE = new LinearScale(0.62, 0);
     private static double TURN_RAMP_POWER_CUTOFF = 0.1;
     public static double RAMP_POWER_CUTOFF;
@@ -235,7 +235,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         return d;
     }
 
-    public double inchesToTicks(int inches) {
+    public int inchesToTicks(int inches) {
         return inches * TICKS_IN_INCH;
     }
 

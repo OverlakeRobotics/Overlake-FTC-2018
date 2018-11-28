@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.systems.distance.DistanceSystem;
  * Created by idiot on 10/11/17.
  */
 
-@Autonomous(name = "EducayshunOpMode", group = "Bot")
+@Autonomous(name = "EducayshunBoi", group = "Bot")
 public abstract class AutonomousOpMode extends LinearOpMode {
 
     MecanumDriveSystem driveSystem;
@@ -32,10 +32,12 @@ public abstract class AutonomousOpMode extends LinearOpMode {
         waitForStart();
         ////
 
-        for (int i = 0; i < 10000000; i++) {
+        /*for (int i = 0; i < 10000000; i++) {
             distanceSystem.findpower2(12, 1);
             sleep(5);
-        }
+        }*/
+
+        distanceSystem.driveTest(60, 4, 16, 0.7);
 
         // FR BL BR FL
 

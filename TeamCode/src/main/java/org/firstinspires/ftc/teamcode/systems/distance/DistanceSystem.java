@@ -130,15 +130,15 @@ public class DistanceSystem extends System {
     }
 
     public double getDistance1() {
-        telemetry.log("lidar1", ("" + lidar));
-        telemetry.log("range", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
+        //telemetry.log("lidar1", ("" + lidar));
+        //telemetry.log("range", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
         telemetry.write();
         return lidar.getDistance(DistanceUnit.INCH);
     }
 
     public double getDistance2() {
-        telemetry.log("lidar2", ("" + lidar2));
-        telemetry.log("range", String.format("%.01f in", lidar2.getDistance(DistanceUnit.INCH)));
+        //telemetry.log("lidar2", ("" + lidar2));
+        //telemetry.log("range", String.format("%.01f in", lidar2.getDistance(DistanceUnit.INCH)));
         telemetry.write();
         return lidar2.getDistance(DistanceUnit.INCH);
     }
@@ -202,6 +202,103 @@ public class DistanceSystem extends System {
         double ds = 10.0; // inches
         double d = (d1 * (Math.sin(Math.atan((ds/df)))));
         return d;
+    }
+
+    public void driveTest(int inches, double closeBuffer, double farBuffer, double power) {
+        int ticks = driveSystem.inchesToTicks(inches);
+        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+
+        driveSystem.motorFrontRight.setTargetPosition(driveSystem.motorFrontRight.getCurrentPosition() + ticks);
+        driveSystem.motorFrontLeft.setTargetPosition(driveSystem.motorFrontLeft.getCurrentPosition() + ticks);
+        driveSystem.motorBackRight.setTargetPosition(driveSystem.motorBackRight.getCurrentPosition() + ticks);
+        driveSystem.motorBackLeft.setTargetPosition(driveSystem.motorBackLeft.getCurrentPosition() + ticks);
+
+        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        Ramp ramp = new ExponentialRamp(new Point(0, driveSystem.RAMP_POWER_CUTOFF),
+                new Point((ticks / 4), power));
+
+        double adjustedPower = Range.clip(power, -1.0, 1.0);
+
+        driveSystem.motorBackRight.setPower(adjustedPower);
+        driveSystem.motorBackLeft.setPower(adjustedPower);
+        driveSystem.motorFrontLeft.setPower(adjustedPower);
+        driveSystem.motorFrontRight.setPower(adjustedPower);
+
+        while (driveSystem.motorFrontLeft.isBusy() ||
+                driveSystem.motorFrontRight.isBusy() ||
+                driveSystem.motorBackRight.isBusy() ||
+                driveSystem.motorBackLeft.isBusy()) {
+
+            if ((getDistance1() <= closeBuffer) ||
+                    (getDistance2() <= closeBuffer) ||
+                    (getDistance1() >= farBuffer) ||
+                    (getDistance2() >= farBuffer)) {
+                telemetry.log("driveTest", "distance buffer triggered");
+
+                driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                driveSystem.setPower(0);
+
+                double turnDirection = 1.0;
+                if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
+                    turnDirection = -1.0;
+                } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
+                    turnDirection = 1.0;
+                }
+                double tankPower = (turnDirection * (power / 2));
+                
+                while ((getDistance1() >= closeBuffer) ||
+                        (getDistance2() >= closeBuffer) ||
+                        (getDistance1() <= farBuffer) ||
+                        (getDistance2() <= farBuffer)) {
+                    telemetry.log("driveTest", "correcting. R-power: " + tankPower);
+
+                    driveSystem.tankDrive(-tankPower, tankPower);
+                }
+                driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+            int distance = driveSystem.getMinDistanceFromTarget();
+
+            if (distance < 50) {
+                break;
+            }
+
+            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + driveSystem.motorFrontLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + driveSystem.motorFrontRight.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + driveSystem.motorBackLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + driveSystem.motorBackRight.getTargetPosition());
+
+            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + driveSystem.motorFrontLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + driveSystem.motorFrontRight.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + driveSystem.motorBackLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + driveSystem.motorBackRight.getCurrentPosition());
+
+            double direction = 1.0;
+            if (distance < 0) {
+                distance = -distance;
+                direction = -1.0;
+            }
+
+            double scaledPower = ramp.scaleX(distance);
+            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
+            driveSystem.setPower(direction * scaledPower);
+            telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
+            telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
+            telemetry.log("MecanumDriveSystem","power motorBL: " + driveSystem.motorBackLeft.getPower());
+            telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
+            telemetry.write();
+        }
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
     }
 
 

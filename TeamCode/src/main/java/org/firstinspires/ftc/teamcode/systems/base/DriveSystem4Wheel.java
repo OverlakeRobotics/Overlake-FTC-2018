@@ -42,6 +42,13 @@ public class DriveSystem4Wheel extends System
         this.motorBackRight.setPower(power);
     }
 
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+        this.motorFrontLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        this.motorFrontRight.setZeroPowerBehavior(zeroPowerBehavior);
+        this.motorBackLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        this.motorBackRight.setZeroPowerBehavior(zeroPowerBehavior);
+    }
+
     public boolean anyMotorsBusy()
     {
         return motorFrontLeft.isBusy() ||
