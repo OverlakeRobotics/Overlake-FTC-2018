@@ -144,7 +144,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
         setDirection(DriveDirection.FORWARD);
-        driveToPositionTicks(ticks, power);
+        driveToPositionTicksRef(ticks, power);
     }
 
     public void strafeLeftToPositionInches(int inches, double power) {
@@ -227,11 +227,60 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         motorFrontLeft.setPower(0);
     }
 
+    private void driveToPositionTicksRef(int ticks, double power) {
+        setPower(0);
+
+        motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
+        motorFrontLeft.setTargetPosition(motorFrontLeft.getCurrentPosition() + ticks);
+        motorBackRight.setTargetPosition(motorBackRight.getCurrentPosition() + ticks);
+        motorBackLeft.setTargetPosition(motorBackLeft.getCurrentPosition() + ticks);
+
+        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
+                new Point((ticks / 4), power));
+
+        double adjustedPower = Range.clip(power, -1.0, 1.0);
+
+        setPower(adjustedPower);
+
+        while (anyMotorsBusy()) {
+
+            int distance = getMinDistanceFromTarget();
+
+            if (distance < 50) {
+                break;
+            }
+
+            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + this.motorFrontLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + this.motorFrontRight.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + this.motorBackLeft.getTargetPosition());
+            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + this.motorBackRight.getTargetPosition());
+
+            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + this.motorFrontLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + this.motorFrontRight.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + this.motorBackLeft.getCurrentPosition());
+            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + this.motorBackRight.getCurrentPosition());
+
+            double direction = 1.0;
+            if (distance < 0) {
+                distance = -distance;
+                direction = -1.0;
+            }
+
+            double scaledPower = ramp.scaleX(distance);
+            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
+            setPower(direction * scaledPower);
+            telemetry.write();
+        }
+        setPower(0);
+    }
+
     public int  getMinDistanceFromTarget() {
         int d = this.motorFrontLeft.getTargetPosition() - this.motorFrontLeft.getCurrentPosition();
-        d = min(d, this.motorFrontRight.getTargetPosition() - this.motorFrontRight.getCurrentPosition());
-        d = min(d, this.motorBackLeft.getTargetPosition() - this.motorBackLeft.getCurrentPosition());
-        d = min(d, this.motorBackRight.getTargetPosition() - this.motorBackRight.getCurrentPosition());
+        d = Math.min(d, this.motorFrontRight.getTargetPosition() - this.motorFrontRight.getCurrentPosition());
+        d = Math.min(d, this.motorBackLeft.getTargetPosition() - this.motorBackLeft.getCurrentPosition());
+        d = Math.min(d, this.motorBackRight.getTargetPosition() - this.motorBackRight.getCurrentPosition());
         return d;
     }
 
@@ -241,14 +290,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     public double inchesToTicksStrafe(int inches) {
         return inches * TICKS_IN_INCH_STRAFE;
-    }
-
-    private int min(int d1, int d2) {
-        if (d1 < d2) {
-            return d1;
-        } else {
-            return d2;
-        }
     }
 
     public void turnAbsolute(double degrees, double maxPower) {

@@ -248,19 +248,22 @@ public class DistanceSystem extends System {
 
                 double turnDirection = 1.0;
                 if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
+                    telemetry.log("driveTest", "turning RIGHT");
                     turnDirection = -1.0;
                 } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
+                    telemetry.log("driveTest", "turning LEFT");
                     turnDirection = 1.0;
                 }
                 double tankPower = (turnDirection * (power / 2));
                 
-                while ((getDistance1() >= closeBuffer) ||
-                        (getDistance2() >= closeBuffer) ||
-                        (getDistance1() <= farBuffer) ||
-                        (getDistance2() <= farBuffer)) {
-                    telemetry.log("driveTest", "correcting. R-power: " + tankPower);
+                while ((getDistance1() >= farBuffer) ||
+                        (getDistance2() >= farBuffer) ||
+                        (getDistance1() <= closeBuffer) ||
+                        (getDistance2() <= closeBuffer)) {
+                    telemetry.log("driveTest", "looping correction R-power: " + tankPower);
 
                     driveSystem.tankDrive(-tankPower, tankPower);
+
                 }
                 driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
