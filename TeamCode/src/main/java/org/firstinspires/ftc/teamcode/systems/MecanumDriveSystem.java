@@ -346,21 +346,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         return targetHeading - heading;
     }
 
-    public void parkOnCrater(double maxPower) {
-        double initPitch = imuSystem.getpitch();
-        double initRoll = imuSystem.getRoll();
-        double criticalAngle = 1.5;
-
-        setDirection(DriveDirection.FORWARD);
-        setPower(maxPower);
-
-        while ((Math.abs(imuSystem.getpitch() - initPitch) < criticalAngle) &&
-                (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle)) {
-            setPower(maxPower);
-        }
-        setPower(0);
-    }
-
     public void setDirection(MecanumDriveDirection direction) {
         switch (direction){
             case STRAFE_LEFT:

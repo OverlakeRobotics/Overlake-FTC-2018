@@ -24,8 +24,7 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         waitForStart();
         ////
 
-        //disSys.driveAlongWallInches(60, 12, 1);
-        disSys.driveTest(600, 6, 12, 0.7);
+        disSys.driveAlongWallInches(60, 3, 6, 1);
 
         //driveSystem.turn(90, 1);
 
