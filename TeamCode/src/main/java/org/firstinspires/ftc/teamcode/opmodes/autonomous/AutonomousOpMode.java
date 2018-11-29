@@ -23,21 +23,10 @@ public abstract class AutonomousOpMode extends LinearOpMode {
     public void runOpMode()
     {
 
-        telem("About to initialize systems.", 0.25);
-        driveSystem = new MecanumDriveSystem(this);
-        distanceSystem = new DistanceSystem(this, driveSystem);
-        telem("Initialized all systems. Ready.", 0.25);
 
         ////
         waitForStart();
         ////
-
-        /*for (int i = 0; i < 10000000; i++) {
-            distanceSystem.findpower2(12, 1);
-            sleep(5);
-        }*/
-
-        distanceSystem.driveTest(60, 4, 16, 0.7);
 
         // FR BL BR FL
 

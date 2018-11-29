@@ -290,16 +290,7 @@ public class DistanceSystem extends System {
                         rightPower = turnPower;
                         leftPower = 0;
                     }
-
-                    telemetry.log("driveTest", "looping correction R-power: " + rightPower);
-                    telemetry.log("driveTest", "looping correction R-power: " + leftPower);
-
-                    telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
-                    telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
-                    telemetry.log("MecanumDriveSystem","power motorBL: " + driveSystem.motorBackLeft.getPower());
-                    telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
                     telemetry.write();
-
                     driveSystem.tankDrive(leftPower, rightPower);
 
                 }
@@ -309,22 +300,111 @@ public class DistanceSystem extends System {
                 break;
             }
 
-            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + driveSystem.motorFrontLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + driveSystem.motorFrontRight.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + driveSystem.motorBackLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + driveSystem.motorBackRight.getTargetPosition());
-
-            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + driveSystem.motorFrontLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + driveSystem.motorFrontRight.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + driveSystem.motorBackLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + driveSystem.motorBackRight.getCurrentPosition());
-
-            telemetry.log("MecanumDriveSystem","power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
-            telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
-            telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
-            telemetry.log("MecanumDriveSystem","power motorBL: " + driveSystem.motorBackLeft.getPower());
-            telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
+            telemetry.write();
+        }
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
+    }
+
+    public void driveAlongWallToDepot(double closeBuffer, double farBuffer, double power) {
+        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+
+        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        double adjustedPower = Range.clip(power, -1.0, 1.0);
+
+        driveSystem.motorBackRight.setPower(adjustedPower);
+        driveSystem.motorBackLeft.setPower(adjustedPower);
+        driveSystem.motorFrontLeft.setPower(adjustedPower);
+        driveSystem.motorFrontRight.setPower(adjustedPower);
+
+        while (driveSystem.motorFrontLeft.isBusy() ||
+                driveSystem.motorFrontRight.isBusy() ||
+                driveSystem.motorBackRight.isBusy() ||
+                driveSystem.motorBackLeft.isBusy()) {
+
+            if ((getDistance1() <= closeBuffer) ||
+                    (getDistance2() <= closeBuffer) ||
+                    (getDistance1() >= farBuffer) ||
+                    (getDistance2() >= farBuffer)) {
+                telemetry.log("driveTest", "distance buffer triggered");
+
+                driveSystem.setPower(0);
+
+                while ((getDistance1() >= farBuffer) ||
+                        (getDistance2() >= farBuffer) ||
+                        (getDistance1() <= closeBuffer) ||
+                        (getDistance2() <= closeBuffer)) {
+
+                    double turnPower = (power / 2);
+                    double rightPower = turnPower;
+                    double leftPower = turnPower;
+                    /*if ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer)) {
+                        if (power > 0) {
+                            telemetry.log("driveTest", "turning LEFT");
+                            rightPower = turnPower;
+                            leftPower = 0;
+                        } else {
+                            telemetry.log("driveTest", "turning RIGHT");
+                            rightPower = 0;
+                            leftPower = turnPower;
+                        }
+                    } else if ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer)) {
+                        if (power > 0) {
+                            telemetry.log("driveTest", "turning RIGHT");
+                            rightPower = 0;
+                            leftPower = turnPower;
+                        } else {
+                            telemetry.log("driveTest", "turning LEFT");
+                            rightPower = turnPower;
+                            leftPower = 0;
+                        }
+                    }*/
+                    if (((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) ||
+                            ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
+                        if (power > 0) {
+                            telemetry.log("driveTest", "turning RIGHT");
+                            rightPower = 0;
+                            leftPower = turnPower;
+                        } else {
+                            telemetry.log("driveTest", "turning LEFT");
+                            rightPower = turnPower;
+                            leftPower = 0;
+                        }
+                    } else if (((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) ||
+                            ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
+                        if (power > 0) {
+                            telemetry.log("driveTest", "turning LEFT");
+                            rightPower = turnPower;
+                            leftPower = 0;
+                        } else {
+                            telemetry.log("driveTest", "turning RIGHT");
+                            rightPower = 0;
+                            leftPower = turnPower;
+                        }
+                    }
+
+                    telemetry.write();
+                    driveSystem.tankDrive(leftPower, rightPower);
+
+                }
+            }
+
+            if (isInDepot()) {
+                break;
+            }
+
+            driveSystem.setPower(adjustedPower);
             telemetry.write();
         }
         driveSystem.motorBackLeft.setPower(0);
@@ -338,6 +418,26 @@ public class DistanceSystem extends System {
         return ((Math.abs(imu.getpitch() - initPitch) < criticalAngle) ||
                 (Math.abs(imu.getRoll() - initRoll) < criticalAngle));
     }
+
+    public boolean isInDepot() {
+        int redTriggerValue = 12;
+        int blueTriggerValue = 8;
+        return ((colorSystem.getRed() < redTriggerValue) ||
+                (colorSystem.getBlue() < blueTriggerValue));
+    }
+
+    /*public void parkInDepot(double maxPower, ColorSystem colorSystem) {
+        int redTriggerValue = 12;
+        int blueTriggerValue = 8;
+        setDirection(DriveDirection.FORWARD);
+        setPower(maxPower);
+
+        while ((colorSystem.getRed() < redTriggerValue) &&
+                (colorSystem.getBlue() < blueTriggerValue)) {
+            setPower(maxPower);
+        }
+        setPower(0);
+    }*/
 
     /*public void parkOnCrater(double maxPower) {
         double initPitch = imuSystem.getpitch();
