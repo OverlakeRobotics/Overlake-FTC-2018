@@ -26,7 +26,9 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
 
         //disSys.driveAlongWallInches(60, 3, 6, 1);
 
-        disSys.driveAlongWallToCrater(3, 6, 1);
+        //disSys.driveAlongWallToCrater(3, 6, 1);
+
+        driveSystem.driveToPositionInches(30, 1.0);
 
         //driveSystem.turn(90, 1);
 

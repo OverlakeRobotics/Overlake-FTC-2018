@@ -18,7 +18,6 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public IMUSystem imuSystem;
     public ColorSystem colorSystem;
     public DistanceSystem disSys;
-    //public EyeSystem eye;
 
     public BaseAutonomousOpMode(String opModeName)
     {
@@ -32,6 +31,5 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         this.imuSystem = new IMUSystem(this);
         colorSystem = new ColorSystem(this);
         disSys = new DistanceSystem(this, driveSystem, imuSystem, colorSystem);
-        //this.eye = new EyeSystem(this);
     }
 }

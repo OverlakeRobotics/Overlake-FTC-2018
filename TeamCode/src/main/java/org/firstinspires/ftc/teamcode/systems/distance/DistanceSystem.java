@@ -47,43 +47,22 @@ public class DistanceSystem extends System {
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)lidar;
     }
 
-
-    public double getFrontRightDistance() {
-        double d1 = getDistance1();
-        double d2 = getDistance2();
-        double dp = 9; //distance between
-        //return d2 * Math.cos((1/Math.tan(((d2 - d1) * dp))));
-        return d1;
-    }
-
     public double getDistance1() {
-        //telemetry.log("lidar1", ("" + lidar));
-        //telemetry.log("range", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
-        telemetry.write();
         return lidar.getDistance(DistanceUnit.INCH);
     }
 
     public double getDistance2() {
-        //telemetry.log("lidar2", ("" + lidar2));
-        //telemetry.log("range", String.format("%.01f in", lidar2.getDistance(DistanceUnit.INCH)));
-        telemetry.write();
         return lidar2.getDistance(DistanceUnit.INCH);
     }
 
     public void telemetry() {
-        // generic DistanceSensor methods.
-        telemetry.log("lidar1", ("" + lidar));
-        telemetry.log("lidar2", ("" + lidar2));
-        telemetry.log("range", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
-        telemetry.log("shaerposte: ", "" + getFrontRightDistance());
-
-
-        telemetry.log("MecanumDriveSystem","disp 12, power 1.0, PowerX: ");
-
+        telemetry.log("range1", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
+        telemetry.log("range2", String.format("%.01f in", lidar2.getDistance(DistanceUnit.INCH)));
+        telemetry.log("frontRightDistance: ", "" + getFrontRightDistance());
         telemetry.write();
     }
 
-    public double getDistanceTopRight() {
+    public double getFrontRightDistance() {
         double d1 = getDistance1();
         double d2 = getDistance2();
         double df = d1 - d2;
@@ -138,50 +117,11 @@ public class DistanceSystem extends System {
                         (getDistance1() <= closeBuffer) ||
                         (getDistance2() <= closeBuffer)) {
 
-                    double turnPower = (power / 2);
-                    double rightPower = turnPower;
-                    double leftPower = turnPower;
-                    if ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer)) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        } else {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        }
-                    } else if ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer)) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        } else {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        }
-                    } else if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
-                        telemetry.log("driveTest", "turning RIGHT");
-                        rightPower = 0;
-                        leftPower = turnPower;
-                    } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
-                        telemetry.log("driveTest", "turning LEFT");
-                        rightPower = turnPower;
-                        leftPower = 0;
-                    }
-
-                    telemetry.log("driveTest", "looping correction R-power: " + rightPower);
-                    telemetry.log("driveTest", "looping correction R-power: " + leftPower);
-
-                    telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
-                    telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
-                    telemetry.log("MecanumDriveSystem","power motorBL: " + driveSystem.motorBackLeft.getPower());
-                    telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
-                    telemetry.write();
+                    double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, power);
+                    double leftPower = correctionPowers[0];
+                    double rightPower = correctionPowers[1];
 
                     driveSystem.tankDrive(leftPower, rightPower);
-
                 }
             }
             int distance = driveSystem.getMinDistanceFromTarget();
@@ -258,41 +198,11 @@ public class DistanceSystem extends System {
                         (getDistance1() <= closeBuffer) ||
                         (getDistance2() <= closeBuffer)) {
 
-                    double turnPower = (power / 2);
-                    double rightPower = turnPower;
-                    double leftPower = turnPower;
-                    if ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer)) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        } else {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        }
-                    } else if ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer)) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        } else {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        }
-                    } else if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
-                        telemetry.log("driveTest", "turning RIGHT");
-                        rightPower = 0;
-                        leftPower = turnPower;
-                    } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
-                        telemetry.log("driveTest", "turning LEFT");
-                        rightPower = turnPower;
-                        leftPower = 0;
-                    }
-                    telemetry.write();
-                    driveSystem.tankDrive(leftPower, rightPower);
+                    double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, power);
+                    double leftPower = correctionPowers[0];
+                    double rightPower = correctionPowers[1];
 
+                    driveSystem.tankDrive(leftPower, rightPower);
                 }
             }
 
@@ -346,10 +256,72 @@ public class DistanceSystem extends System {
                         (getDistance1() <= closeBuffer) ||
                         (getDistance2() <= closeBuffer)) {
 
-                    double turnPower = (power / 2);
-                    double rightPower = turnPower;
-                    double leftPower = turnPower;
-                    /*if ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer)) {
+                    double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, power);
+                    double leftPower = correctionPowers[0];
+                    double rightPower = correctionPowers[1];
+
+                    driveSystem.tankDrive(leftPower, rightPower);
+                }
+            }
+
+            if (isInDepot()) {
+                break;
+            }
+
+            driveSystem.setPower(adjustedPower);
+            telemetry.write();
+        }
+        driveSystem.motorBackLeft.setPower(0);
+        driveSystem.motorBackRight.setPower(0);
+        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.motorFrontLeft.setPower(0);
+    }
+
+    public double[] getCorrectionTurnPower(double closeBuffer, double farBuffer, double power) {
+        double turnPower = (power / 2);
+        double rightPower = turnPower;
+        double leftPower = turnPower;
+        if (((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) ||
+                ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
+            if (power > 0) {
+                telemetry.log("driveTest", "turning RIGHT");
+                rightPower = 0;
+                leftPower = turnPower;
+            } else {
+                telemetry.log("driveTest", "turning LEFT");
+                rightPower = turnPower;
+                leftPower = 0;
+            }
+        } else if (((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) ||
+                ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
+            if (power > 0) {
+                telemetry.log("driveTest", "turning LEFT");
+                rightPower = turnPower;
+                leftPower = 0;
+            } else {
+                telemetry.log("driveTest", "turning RIGHT");
+                rightPower = 0;
+                leftPower = turnPower;
+            }
+        }
+        double[] powers = new double[] {leftPower, rightPower};
+        return powers;
+    }
+
+    public boolean isOnCrater() {
+        double criticalAngle = 1.5;
+        return ((Math.abs(imu.getpitch() - initPitch) < criticalAngle) ||
+                (Math.abs(imu.getRoll() - initRoll) < criticalAngle));
+    }
+
+    public boolean isInDepot() {
+        int redTriggerValue = 12;
+        int blueTriggerValue = 8;
+        return ((colorSystem.getRed() < redTriggerValue) ||
+                (colorSystem.getBlue() < blueTriggerValue));
+    }
+
+    /* if ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer)) {
                         if (power > 0) {
                             telemetry.log("driveTest", "turning LEFT");
                             rightPower = turnPower;
@@ -369,88 +341,13 @@ public class DistanceSystem extends System {
                             rightPower = turnPower;
                             leftPower = 0;
                         }
+                    } else if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
+                        telemetry.log("driveTest", "turning RIGHT");
+                        rightPower = 0;
+                        leftPower = turnPower;
+                    } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
+                        telemetry.log("driveTest", "turning LEFT");
+                        rightPower = turnPower;
+                        leftPower = 0;
                     }*/
-                    if (((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) ||
-                            ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        } else {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        }
-                    } else if (((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) ||
-                            ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        } else {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        }
-                    }
-
-                    telemetry.write();
-                    driveSystem.tankDrive(leftPower, rightPower);
-
-                }
-            }
-
-            if (isInDepot()) {
-                break;
-            }
-
-            driveSystem.setPower(adjustedPower);
-            telemetry.write();
-        }
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
-    }
-
-    public boolean isOnCrater() {
-        double criticalAngle = 1.5;
-        return ((Math.abs(imu.getpitch() - initPitch) < criticalAngle) ||
-                (Math.abs(imu.getRoll() - initRoll) < criticalAngle));
-    }
-
-    public boolean isInDepot() {
-        int redTriggerValue = 12;
-        int blueTriggerValue = 8;
-        return ((colorSystem.getRed() < redTriggerValue) ||
-                (colorSystem.getBlue() < blueTriggerValue));
-    }
-
-    /*public void parkInDepot(double maxPower, ColorSystem colorSystem) {
-        int redTriggerValue = 12;
-        int blueTriggerValue = 8;
-        setDirection(DriveDirection.FORWARD);
-        setPower(maxPower);
-
-        while ((colorSystem.getRed() < redTriggerValue) &&
-                (colorSystem.getBlue() < blueTriggerValue)) {
-            setPower(maxPower);
-        }
-        setPower(0);
-    }*/
-
-    /*public void parkOnCrater(double maxPower) {
-        double initPitch = imuSystem.getpitch();
-        double initRoll = imuSystem.getRoll();
-        double criticalAngle = 1.5;
-
-        setDirection(DriveDirection.FORWARD);
-        setPower(maxPower);
-
-        while ((Math.abs(imuSystem.getpitch() - initPitch) < criticalAngle) &&
-                (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle)) {
-            setPower(maxPower);
-        }
-        setPower(0);
-    }*/
 }
