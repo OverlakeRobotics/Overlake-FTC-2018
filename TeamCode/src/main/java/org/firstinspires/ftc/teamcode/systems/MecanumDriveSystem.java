@@ -51,6 +51,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     // test
     public void mecanumDrive(float rightX, float rightY, float leftX, float leftY, boolean slowDrive) {
+        setDirection(DriveDirection.FORWARD);
         rightX = Range.clip(rightX, -1, 1);
         leftX = Range.clip(leftX, -1, 1);
         leftY = Range.clip(leftY, -1, 1);
@@ -60,10 +61,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         leftY = scaleJoystickValue(leftY);
 
         // write the values to the motors 1
-        double frontRightPower = leftY + leftX + rightX;
+        double frontRightPower = -leftY - leftX - rightX;
         double backRightPower = -leftY + leftX + rightX;
         double frontLeftPower = -leftY + leftX - rightX;
-        double backLeftPower = leftY + leftX - rightX;
+        double backLeftPower = -leftY - leftX + rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
         telemetry.log("Mecanum Drive System","FRpower: {0}", Range.clip(frontRightPower, -1, 1));
@@ -363,16 +364,16 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public void setDirection(MecanumDriveDirection direction) {
         switch (direction){
             case STRAFE_LEFT:
-                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
                 motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 break;
             case STRAFE_RIGHT:
-                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
         }
     }

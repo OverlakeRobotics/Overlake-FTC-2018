@@ -243,7 +243,6 @@ public class DistanceSystem extends System {
                     (getDistance2() >= farBuffer)) {
                 telemetry.log("driveTest", "distance buffer triggered");
 
-                driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 driveSystem.setPower(0);
                 
                 while ((getDistance1() >= farBuffer) ||
@@ -251,17 +250,21 @@ public class DistanceSystem extends System {
                         (getDistance1() <= closeBuffer) ||
                         (getDistance2() <= closeBuffer)) {
 
-                    double turnDirection = 1.0;
+                    double turnPower = (power / 2);
+                    double rightPower = turnPower;
+                    double leftPower = turnPower;
                     if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
                         telemetry.log("driveTest", "turning RIGHT");
-                        turnDirection = -1.0;
+                        rightPower = 0;
+                        leftPower = turnPower;
                     } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
                         telemetry.log("driveTest", "turning LEFT");
-                        turnDirection = 1.0;
+                        rightPower = turnPower;
+                        leftPower = 0;
                     }
-                    double tankPower = (turnDirection * (power / 2));
 
-                    telemetry.log("driveTest", "looping correction R-power: " + tankPower);
+                    telemetry.log("driveTest", "looping correction R-power: " + rightPower);
+                    telemetry.log("driveTest", "looping correction R-power: " + leftPower);
 
                     telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
                     telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
@@ -269,15 +272,9 @@ public class DistanceSystem extends System {
                     telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
                     telemetry.write();
 
-                    driveSystem.tankDrive(-tankPower, tankPower);
-
-                    //driveSystem.motorBackRight.setPower(tankPower);
-                    //driveSystem.motorBackLeft.setPower(-tankPower);
-                    //driveSystem.motorFrontLeft.setPower(-tankPower);
-                    //driveSystem.motorFrontRight.setPower(tankPower);
+                    driveSystem.tankDrive(leftPower, rightPower);
 
                 }
-                driveSystem.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
             int distance = driveSystem.getMinDistanceFromTarget();
 

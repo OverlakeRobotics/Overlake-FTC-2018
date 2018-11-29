@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
+import org.firstinspires.ftc.teamcode.systems.base.DriveSystem4Wheel;
+
 @Autonomous(name = "EducayshunOpMode", group = "Bot")
 public class EducayshunOpMode extends BaseAutonomousOpMode {
 
@@ -22,9 +25,32 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         ////
 
         //disSys.driveAlongWallInches(60, 12, 1);
-        //disSys.driveTest(600, 4, 16, 0.7);
+        disSys.driveTest(600, 6, 12, 0.7);
 
-        driveSystem.turn(90, 1);
+        //driveSystem.turn(90, 1);
+
+        /*driveSystem.motorFrontLeft.setPower(1);
+        sleep(1000);
+        driveSystem.motorFrontLeft.setPower(0);
+        sleep(1000);
+        driveSystem.motorFrontRight.setPower(1);
+        sleep(1000);
+        driveSystem.motorFrontRight.setPower(0);
+        sleep(1000);
+        driveSystem.motorBackRight.setPower(1);
+        sleep(1000);
+        driveSystem.motorBackRight.setPower(0);
+        sleep(1000);
+        driveSystem.motorBackLeft.setPower(1);
+        sleep(1000);
+        driveSystem.motorBackLeft.setPower(0);
+        sleep(1000);*/
+
+        driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);
+        driveSystem.setPower(0.8);
+        sleep(5000);
+
+
 
         //driveSystem.driveToPositionInches(15, 1);
 
