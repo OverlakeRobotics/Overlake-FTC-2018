@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
@@ -15,6 +16,7 @@ public class JaredTest extends LinearOpMode {
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
+    private AnalogInput sonar = null;
     private IMUSystem imuSystem = null;
 
     @Override
@@ -23,6 +25,7 @@ public class JaredTest extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "front_right_drive");
         backLeftDrive  = hardwareMap.get(DcMotor.class, "back_left_drive");
         backRightDrive = hardwareMap.get(DcMotor.class, "back_right_drive");
+        sonar = hardwareMap.get(AnalogInput.class, "sonar");
         imuSystem = new IMUSystem(this);
 
 
@@ -57,7 +60,7 @@ public class JaredTest extends LinearOpMode {
 
             double modifier;
             if(Math.abs(strafe) != 0.0) {
-                modifier = (desiredHeading - imuSystem.getHeading()) / 30;
+                modifier = (desiredHeading - imuSystem.getHeading()) / 25;
             } else {
                 desiredHeading = imuSystem.getHeading();
                 modifier = 0.0;
@@ -68,6 +71,7 @@ public class JaredTest extends LinearOpMode {
             backLeftDrive.setPower(leftPower + strafe + modifier);
             backRightDrive.setPower(rightPower - strafe - modifier);
 
+            telemetry.addData("rightSonar", "%.3f v", (double) sonar.getVoltage());
             telemetry.addData("Heading", imuSystem.getHeading());
             telemetry.addData("Left stick", gamepad1.left_stick_y);
             telemetry.update();
