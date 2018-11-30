@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.systems;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
@@ -60,15 +62,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         leftY = scaleJoystickValue(leftY);
 
         // write the values to the motors 1
-        //double frontRightPower = -leftY - leftX - rightX;
-        //double backRightPower = -leftY + leftX + rightX;
-        //double frontLeftPower = -leftY + leftX - rightX;
-        //double backLeftPower = -leftY - leftX + rightX;
-
-        double frontRightPower = leftY - leftX - rightX;
-        double backRightPower = leftY + leftX - rightX;
-        double frontLeftPower = leftY + leftX + rightX;
-        double backLeftPower = leftY - leftX + rightX;
+        double frontRightPower = -leftY + leftX - rightX;
+        double backRightPower = -leftY - leftX - rightX;
+        double frontLeftPower = -leftY - leftX + rightX;
+        double backLeftPower = -leftY + leftX + rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
         telemetry.log("Mecanum Drive System","FRpower: {0}", Range.clip(frontRightPower, -1, 1));
@@ -149,7 +146,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
         setDirection(DriveDirection.FORWARD);
-        //driveToPositionTicksRef(ticks, power);
         driveToPositionTicks(ticks, power);
     }
 
@@ -231,55 +227,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         motorBackRight.setPower(0);
         motorFrontRight.setPower(0);
         motorFrontLeft.setPower(0);
-    }
-
-    private void driveToPositionTicksRef(int ticks, double power) {
-        setPower(0);
-
-        motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
-        motorFrontLeft.setTargetPosition(motorFrontLeft.getCurrentPosition() + ticks);
-        motorBackRight.setTargetPosition(motorBackRight.getCurrentPosition() + ticks);
-        motorBackLeft.setTargetPosition(motorBackLeft.getCurrentPosition() + ticks);
-
-        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
-                new Point((ticks / 4), power));
-
-        double adjustedPower = Range.clip(power, -1.0, 1.0);
-
-        setPower(adjustedPower);
-
-        while (anyMotorsBusy()) {
-
-            int distance = getMinDistanceFromTarget();
-
-            if (distance < 50) {
-                break;
-            }
-
-            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + this.motorFrontLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + this.motorFrontRight.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + this.motorBackLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + this.motorBackRight.getTargetPosition());
-
-            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + this.motorFrontLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + this.motorFrontRight.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + this.motorBackLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + this.motorBackRight.getCurrentPosition());
-
-            double direction = 1.0;
-            if (distance < 0) {
-                distance = -distance;
-                direction = -1.0;
-            }
-
-            double scaledPower = ramp.scaleX(distance);
-            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
-            setPower(direction * scaledPower);
-            telemetry.write();
-        }
-        setPower(0);
     }
 
     public int  getMinDistanceFromTarget() {

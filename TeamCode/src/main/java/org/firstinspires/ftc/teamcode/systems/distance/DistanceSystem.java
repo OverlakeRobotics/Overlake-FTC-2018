@@ -191,8 +191,6 @@ public class DistanceSystem extends System {
                     (getDistance2() >= farBuffer)) {
                 telemetry.log("driveTest", "distance buffer triggered");
 
-                driveSystem.setPower(0);
-
                 while ((getDistance1() >= farBuffer) ||
                         (getDistance2() >= farBuffer) ||
                         (getDistance1() <= closeBuffer) ||
@@ -202,6 +200,8 @@ public class DistanceSystem extends System {
                     double leftPower = correctionPowers[0];
                     double rightPower = correctionPowers[1];
 
+                    telemetry.log("driveTest", "leftPowerCorrect: " + leftPower);
+                    telemetry.log("driveTest", "rightPowerCorrect: " + rightPower);
                     driveSystem.tankDrive(leftPower, rightPower);
                 }
             }
@@ -211,6 +211,7 @@ public class DistanceSystem extends System {
             }
 
             driveSystem.setPower(adjustedPower);
+            telemetry.log("driveTest", "standard old power: " + adjustedPower);
             telemetry.write();
         }
         driveSystem.motorBackLeft.setPower(0);
@@ -248,6 +249,11 @@ public class DistanceSystem extends System {
                     (getDistance1() >= farBuffer) ||
                     (getDistance2() >= farBuffer)) {
                 telemetry.log("driveTest", "distance buffer triggered");
+
+                driveSystem.motorBackRight.setPower(adjustedPower);
+                driveSystem.motorBackLeft.setPower(adjustedPower);
+                driveSystem.motorFrontLeft.setPower(adjustedPower);
+                driveSystem.motorFrontRight.setPower(adjustedPower);
 
                 driveSystem.setPower(0);
 

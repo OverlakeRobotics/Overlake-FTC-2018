@@ -26,9 +26,9 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
 
         //disSys.driveAlongWallInches(60, 3, 6, 1);
 
-        //disSys.driveAlongWallToCrater(3, 6, 1);
+        disSys.driveAlongWallToCrater(3, 6, 1);
 
-        driveSystem.driveToPositionInches(30, 1.0);
+        //driveSystem.driveToPositionInches(30, 1.0);
 
         //driveSystem.turn(90, 1);
 
@@ -49,9 +49,9 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
         driveSystem.motorBackLeft.setPower(0);
         sleep(1000);*/
 
-        driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);
-        driveSystem.setPower(0.8);
-        sleep(5000);
+        //driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);
+        //driveSystem.setPower(0.8);
+        //sleep(5000);
 
 
 
