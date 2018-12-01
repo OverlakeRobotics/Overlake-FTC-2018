@@ -20,7 +20,7 @@ public class CraterOpMode extends LinearOpMode {
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
     private static final String TAG = "TensorFlowTelemetry";
-    private static final double DistanceToCreator = 36;
+    private static final int DISTANCE_TO_CRATER = 36;
 
     private static final int SCREEN_WIDTH = 1280;
     private static final int SCREEN_CENTER = 1280 / 2;
@@ -147,7 +147,7 @@ public class CraterOpMode extends LinearOpMode {
     private void driveToCrater() {
         hasDriven = true;
         armSystem.rotatePickup();
-        driveSystem.driveToPositionInches(DistanceToCreator);
+        driveSystem.driveToPositionInches(DISTANCE_TO_CRATER);
     }
 
     private boolean hasFoundGoldMineral(int goldMineralX) {
