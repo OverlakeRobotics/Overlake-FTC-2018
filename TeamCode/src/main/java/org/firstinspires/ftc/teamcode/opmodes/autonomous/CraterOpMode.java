@@ -7,8 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
-import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
+import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
 import java.util.List;
@@ -28,10 +27,8 @@ public class CraterOpMode extends LinearOpMode {
 
     private TensorFlow tensorFlow;
     private MecanumDriveSystem driveSystem;
-    private ArmSystem armSystem;
-    private System lineSystem;
     private boolean hasDriven;
-    private Object CraterOpMode;
+
 
     @Override
     public void runOpMode() {
@@ -45,9 +42,9 @@ public class CraterOpMode extends LinearOpMode {
     }
 
     private void initializeOpMode() {
-        driveSystem = new MecanumDriveSystem(CraterOpMode);
+        driveSystem = new MecanumDriveSystem(this);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            tensorFlow = new TensorFlow(CraterOpMode);
+            tensorFlow = new TensorFlow(this);
             tensorFlow.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL);
             tensorFlow.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_SILVER_MINERAL);
         } else {
@@ -146,8 +143,7 @@ public class CraterOpMode extends LinearOpMode {
 
     private void driveToCrater() {
         hasDriven = true;
-        armSystem.rotatePickup();
-        driveSystem.driveToPositionInches(DISTANCE_TO_CRATER);
+        driveSystem.driveToPositionInches(DISTANCE_TO_CRATER, 1);
     }
 
     private boolean hasFoundGoldMineral(int goldMineralX) {
