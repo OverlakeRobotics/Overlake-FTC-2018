@@ -133,7 +133,7 @@ public class CraterOpMode extends LinearOpMode {
         } else {
             Log.i(TAG, "driving forward to hit gold -- gold seen");
             driveSystem.turn(-90, 0.5);
-            driveToCrater(0, 0.5, 1500);
+            driveToCrater();
             hasDriven = true;
         }
     }
@@ -144,7 +144,7 @@ public class CraterOpMode extends LinearOpMode {
         driveSystem.mecanumDriveXY(0, 0);
     }
 
-    private void driveToCrater(int i, double v, int i1) {
+    private void driveToCrater() {
         hasDriven = true;
         armSystem.rotatePickup();
         driveSystem.driveToPositionInches(DistanceToCreator);
