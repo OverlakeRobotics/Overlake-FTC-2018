@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
 import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.IScale;
@@ -35,7 +33,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     private boolean slowDrive;
 
-    public MecanumDriveSystem(OpMode opMode) {
+    public MecanumDriveSystem(String opMode) {
         super(opMode, "MecanumDrive");
 
         //this.config = new ConfigParser("Testy.omc");
@@ -48,6 +46,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
         telemetry.log("MecanumDriveSystem","power: {0}", 0);
         telemetry.log("MecanumDriveSystem","distance: {0}", 0);
+    }
+
+    public MecanumDriveSystem(Object craterOpMode) {
+        super(craterOpMode);
     }
 
     // test
@@ -147,7 +149,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         mecanumDriveXY(x, y);
     }
 
-    public void driveToPositionInches(int inches, double power) {
+    public void driveToPositionInches(int inches) {
         int ticks = (int) inchesToTicks(inches);
         setDirection(DriveDirection.FORWARD);
         driveToPositionTicks(ticks, power);
