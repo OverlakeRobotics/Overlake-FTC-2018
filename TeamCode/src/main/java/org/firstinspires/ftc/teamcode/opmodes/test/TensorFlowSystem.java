@@ -35,7 +35,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
@@ -174,8 +177,10 @@ public class TensorFlowSystem extends LinearOpMode {
         }
     }
 
-    private void drive(int i, double v, int i1) {
-        driveSystem.driveToPositionInches(36);
+    private void drive(double x, double y, int miliseconds) {
+        driveSystem.mecanumDriveXY(x, y);
+        sleep(miliseconds);
+        driveSystem.mecanumDriveXY(0, 0);
     }
 
     private boolean hasFoundGoldMineral(int goldMineralX) {

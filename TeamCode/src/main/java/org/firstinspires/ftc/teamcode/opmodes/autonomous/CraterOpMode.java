@@ -14,12 +14,13 @@ import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 import java.util.List;
 
 
-@Autonomous(name = "tensor_flow")
+@Autonomous(name = "Competition Autonomous")
 public class CraterOpMode extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
     private static final String TAG = "TensorFlowTelemetry";
+    private static final double DistanceToCreator = 36;
 
     private static final int SCREEN_WIDTH = 1280;
     private static final int SCREEN_CENTER = 1280 / 2;
@@ -124,24 +125,29 @@ public class CraterOpMode extends LinearOpMode {
         if (goldMineralX < SCREEN_CENTER - OFFSET) {
             // strafe right to center gold
             Log.i(TAG, "strafing right to center gold");
-            drive(0, -0.2, 75);
+            driveStrafe(0, -0.2, 75);
         } else if (goldMineralX > SCREEN_CENTER + OFFSET) {
             // strafe left to center gold
             Log.i(TAG, "strafing left to center gold");
-            drive(0, 0.2, 75);
+            driveStrafe(0, 0.2, 75);
         } else {
             Log.i(TAG, "driving forward to hit gold -- gold seen");
             driveSystem.turn(-90, 0.5);
-            drive(0, 0.5, 1500);
+            driveToCrater(0, 0.5, 1500);
             hasDriven = true;
         }
     }
 
-    private void drive(int i, double v, int i1) {
-        if(hasDriven = true) {
-            armSystem.rotatePickup();
-            driveSystem.driveToPositionInches(36);
-        }
+    private void driveStrafe(double x, double y, int miliseconds) {
+        driveSystem.mecanumDriveXY(x, y);
+        sleep(miliseconds);
+        driveSystem.mecanumDriveXY(0, 0);
+    }
+
+    private void driveToCrater(int i, double v, int i1) {
+        hasDriven = true;
+        armSystem.rotatePickup();
+        driveSystem.driveToPositionInches(DistanceToCreator);
     }
 
     private boolean hasFoundGoldMineral(int goldMineralX) {
