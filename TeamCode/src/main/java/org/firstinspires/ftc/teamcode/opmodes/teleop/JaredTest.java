@@ -40,13 +40,10 @@ public class JaredTest extends LinearOpMode {
         waitForStart();
         double desiredHeading = 0.0;
         while (opModeIsActive()) {
-<<<<<<< HEAD
-            desiredHeading = driveWithGyroSystem(desiredHeading);
-=======
             double drive = -gamepad1.left_stick_y;
-            double turn = gamepad1.left_stick_x;
+            double turn = gamepad1.right_stick_x;
 
-            double strafe = Range.clip(gamepad1.right_stick_x, -1.0, 1.0);
+            double strafe = Range.clip(gamepad1.left_stick_x, -1.0, 1.0);
 
             double rightPower = Range.clip(drive + turn, -1.0, 1.0) ;
             double leftPower = Range.clip(drive - turn, -1.0, 1.0) ;
@@ -62,7 +59,7 @@ public class JaredTest extends LinearOpMode {
             }
 
             double modifier;
-            if(Math.abs(strafe) != 0.0) {
+            if(strafe != 0.0) {
                 modifier = (desiredHeading - imuSystem.getHeading()) / 25;
             } else {
                 desiredHeading = imuSystem.getHeading();
@@ -74,50 +71,8 @@ public class JaredTest extends LinearOpMode {
             backLeftDrive.setPower(leftPower + strafe + modifier);
             backRightDrive.setPower(rightPower - strafe - modifier);
 
-            telemetry.addData("rightSonar", "%.3f v", (double) sonar.getVoltage());
             telemetry.addData("Heading", imuSystem.getHeading());
-            telemetry.addData("Left stick", gamepad1.left_stick_y);
             telemetry.update();
->>>>>>> ec00586a2b5e7940e915281649f2b57c523fea9b
         }
-    }
-
-    public double driveWithGyroSystem(double desiredHeading) { // When using this in a loop, keep the return value stored, then call it again with the previous return value.
-        double drive = -gamepad1.left_stick_y;
-        double turn = gamepad1.left_stick_x;
-
-        double strafe = Range.clip(gamepad1.right_stick_x, -1.0, 1.0);
-
-        double rightPower = Range.clip(drive + turn, -1.0, 1.0) ;
-        double leftPower = Range.clip(drive - turn, -1.0, 1.0) ;
-
-        if(Math.abs(leftPower) < 0.12) {
-            leftPower = 0.0;
-        }
-        if(Math.abs(rightPower) < 0.12) {
-            rightPower = 0.0;
-        }
-        if(Math.abs(strafe) < 0.12) {
-            strafe = 0.0;
-        }
-
-        double modifier;
-        if(Math.abs(strafe) != 0.0) {
-            modifier = (desiredHeading - imuSystem.getHeading()) / 30;
-        } else {
-            desiredHeading = imuSystem.getHeading();
-            modifier = 0.0;
-        }
-
-        frontLeftDrive.setPower(leftPower - strafe + modifier);
-        frontRightDrive.setPower(rightPower + strafe - modifier);
-        backLeftDrive.setPower(leftPower + strafe + modifier);
-        backRightDrive.setPower(rightPower - strafe - modifier);
-
-        telemetry.addData("Heading", imuSystem.getHeading());
-        telemetry.addData("Left stick", gamepad1.left_stick_y);
-        telemetry.update();
-
-        return desiredHeading;
     }
 }
