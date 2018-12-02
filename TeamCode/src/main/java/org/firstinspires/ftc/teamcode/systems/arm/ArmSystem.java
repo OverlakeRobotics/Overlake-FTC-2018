@@ -142,4 +142,12 @@ public class ArmSystem extends System {
         armRelease.setPosition(0.9);
         setState(ArmState.IDLE);
     }
+
+    /**
+     * Sets the pin of that holds the arm up when latching
+     */
+    public void setArmPin() {
+        armRelease.setPosition(0.4);
+        setState(ArmState.IDLE);
+    }
 }

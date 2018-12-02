@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleOp;
+package org.firstinspires.ftc.teamcode.opmodes.test;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
 /**
  * Created by idiot on 10/11/17.
  */
-@TeleOp(name = "CompetitionTeleOp", group="TeleOp")
-public class TeleOpMode extends TeleOpModeDebugger {
+@TeleOp(name = "TeleOpTest", group="TeleOp")
+public class TeleTestOpMode extends TeleOpModeDebugger {
     private Controller controller1;
     private MecanumDriveSystem driveSystem;
     private ArmSystem armSystem;
@@ -25,7 +25,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
 
     private boolean slowDrive;
 
-    public TeleOpMode() {
+    public TeleTestOpMode() {
         msStuckDetectLoop = 1000000000;
     }
 
