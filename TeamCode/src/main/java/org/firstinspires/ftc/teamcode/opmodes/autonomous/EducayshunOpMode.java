@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
-import org.firstinspires.ftc.teamcode.systems.base.DriveSystem4Wheel;
 
 @Autonomous(name = "EducayshunOpMode", group = "Bot")
 public class EducayshunOpMode extends BaseAutonomousOpMode {

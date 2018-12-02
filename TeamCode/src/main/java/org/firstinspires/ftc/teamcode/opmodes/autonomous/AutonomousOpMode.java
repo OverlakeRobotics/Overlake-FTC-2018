@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.distance.DistanceSystem;
+import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 
 /**
  * Created by idiot on 10/11/17.
