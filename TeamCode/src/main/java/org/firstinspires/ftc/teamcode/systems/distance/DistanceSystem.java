@@ -25,15 +25,16 @@ public class DistanceSystem extends System {
     MecanumDriveSystem driveSystem;
     IMUSystem imu;
     ColorSystem colorSystem;
+    OpMode opMode;
 
     double initPitch;
     double initRoll;
 
-    public DistanceSystem(OpMode opMode, MecanumDriveSystem ds, IMUSystem iMu, ColorSystem cs) {
+    public DistanceSystem(OpMode opMode, MecanumDriveSystem ds, ColorSystem cs) {
         super(opMode, "DriveSystem4Wheel");
         this.hwmap = opMode.hardwareMap;
         driveSystem = ds;
-        imu = iMu;
+        imu = new IMUSystem(opMode);
         colorSystem= cs;
         initSystem();
 
@@ -71,74 +72,34 @@ public class DistanceSystem extends System {
         return d;
     }
 
-    public void driveAlongWallInches(int inches, double closeBuffer, double farBuffer, double power) {
+    public void driveAlongWallInches(int inches, double closeBuffer, double farBuffer, double power,
+                                     boolean shouldRamp) {
         int ticks = driveSystem.inchesToTicks(inches);
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.setPower(0);
 
         driveSystem.motorFrontRight.setTargetPosition(driveSystem.motorFrontRight.getCurrentPosition() + ticks);
         driveSystem.motorFrontLeft.setTargetPosition(driveSystem.motorFrontLeft.getCurrentPosition() + ticks);
         driveSystem.motorBackRight.setTargetPosition(driveSystem.motorBackRight.getCurrentPosition() + ticks);
         driveSystem.motorBackLeft.setTargetPosition(driveSystem.motorBackLeft.getCurrentPosition() + ticks);
 
-        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         Ramp ramp = new ExponentialRamp(new Point(0, driveSystem.RAMP_POWER_CUTOFF),
-                new Point((ticks / 4), power));
+                new Point(driveSystem.RAMP_DISTANCE_TICKS, power));
 
         double adjustedPower = Range.clip(power, -1.0, 1.0);
 
-        driveSystem.motorBackRight.setPower(adjustedPower);
-        driveSystem.motorBackLeft.setPower(adjustedPower);
-        driveSystem.motorFrontLeft.setPower(adjustedPower);
-        driveSystem.motorFrontRight.setPower(adjustedPower);
+        driveSystem.setPower(adjustedPower);
 
-        while (driveSystem.motorFrontLeft.isBusy() ||
-                driveSystem.motorFrontRight.isBusy() ||
-                driveSystem.motorBackRight.isBusy() ||
-                driveSystem.motorBackLeft.isBusy()) {
-
-            if ((getDistance1() <= closeBuffer) ||
-                    (getDistance2() <= closeBuffer) ||
-                    (getDistance1() >= farBuffer) ||
-                    (getDistance2() >= farBuffer)) {
-                telemetry.log("driveTest", "distance buffer triggered");
-
-                driveSystem.setPower(0);
-                
-                while ((getDistance1() >= farBuffer) ||
-                        (getDistance2() >= farBuffer) ||
-                        (getDistance1() <= closeBuffer) ||
-                        (getDistance2() <= closeBuffer)) {
-
-                    double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, power);
-                    double leftPower = correctionPowers[0];
-                    double rightPower = correctionPowers[1];
-
-                    driveSystem.tankDrive(leftPower, rightPower);
-                }
-            }
+        while (driveSystem.anyMotorsBusy()) {
             int distance = driveSystem.getMinDistanceFromTarget();
 
             if (distance < 50) {
                 break;
             }
 
-            telemetry.log("MecanumDriveSystem","targetPos motorFL: " + driveSystem.motorFrontLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorFR: " + driveSystem.motorFrontRight.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBL: " + driveSystem.motorBackLeft.getTargetPosition());
-            telemetry.log("MecanumDriveSystem","targetPos motorBR: " + driveSystem.motorBackRight.getTargetPosition());
-
-            telemetry.log("MecanumDriveSystem","currentPos motorFL: " + driveSystem.motorFrontLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorFR: " + driveSystem.motorFrontRight.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBL: " + driveSystem.motorBackLeft.getCurrentPosition());
-            telemetry.log("MecanumDriveSystem","currentPos motorBR: " + driveSystem.motorBackRight.getCurrentPosition());
+            correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.DISTANCE);
 
             double direction = 1.0;
             if (distance < 0) {
@@ -146,149 +107,120 @@ public class DistanceSystem extends System {
                 direction = -1.0;
             }
 
-            double scaledPower = ramp.scaleX(distance);
-            telemetry.log("MecanumDriveSystem","power: " + scaledPower);
+            double scaledPower = shouldRamp ? ramp.scaleX(distance) : power;
+            telemetry.log("DistanceSystem",
+                    "ticks left (ticks): " + driveSystem.getMinDistanceFromTarget());
+            telemetry.log("DistanceSystem","scaled power: " + scaledPower);
+            telemetry.log("DistanceSystem", "distance1: " + getDistance1());
+            telemetry.log("DistanceSystem", "distance2: " + getDistance2());
             driveSystem.setPower(direction * scaledPower);
-            telemetry.log("MecanumDriveSystem","power motorFL: " + driveSystem.motorFrontLeft.getPower());
-            telemetry.log("MecanumDriveSystem","power motorFR: " + driveSystem.motorFrontRight.getPower());
-            telemetry.log("MecanumDriveSystem","power motorBL: " + driveSystem.motorBackLeft.getPower());
-            telemetry.log("MecanumDriveSystem","power motorBR: " + driveSystem.motorBackRight.getPower());
             telemetry.write();
         }
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
+        driveSystem.setPower(0);
+        telemetry.write();
+    }
+
+    public void correctToFollowWall(double closeBuffer, double farBuffer, double correctionPower,
+                                    StopCondition stopCondition) {
+        boolean isOutOfBounds = isOutOfBounds(closeBuffer, farBuffer);
+        if (isOutOfBounds) {
+            driveSystem.setPower(0);
+            telemetry.log("driveTest", "distance buffer triggered");
+        }
+        while (isOutOfBounds(closeBuffer, farBuffer)) {
+            telemetry.log("driveTest", "isOutOfBounds");
+
+            boolean reachedStopCondition = false;
+            switch (stopCondition) {
+                case DISTANCE:
+                    reachedStopCondition = (driveSystem.getMinDistanceFromTarget() < 50);
+                    break;
+                case DEPOT:
+                    reachedStopCondition = isInDepot();
+                    break;
+                case CRATOR:
+                    reachedStopCondition = isOnCrater();
+                    break;
+            }
+            if (reachedStopCondition) {
+                break;
+            }
+
+            double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, correctionPower);
+            double leftPower = correctionPowers[0];
+            double rightPower = correctionPowers[1];
+
+            driveSystem.tankDrive(leftPower, rightPower);
+            telemetry.log("DistanceSystem", "leftPower: " + leftPower);
+            telemetry.log("DistanceSystem", "rightPower: " +  rightPower);
+            telemetry.write();
+        }
+    }
+
+    private boolean isOutOfBounds(double closeBuffer, double farBuffer) {
+        return (getDistance1() >= farBuffer) ||
+                (getDistance2() >= farBuffer) ||
+                (getDistance1() <= closeBuffer) ||
+                (getDistance2() <= closeBuffer);
     }
 
     public void driveAlongWallToCrater(double closeBuffer, double farBuffer, double power) {
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.setPower(0);
 
-        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         double adjustedPower = Range.clip(power, -1.0, 1.0);
+        driveSystem.setPower(adjustedPower);
 
-        driveSystem.motorBackRight.setPower(adjustedPower);
-        driveSystem.motorBackLeft.setPower(adjustedPower);
-        driveSystem.motorFrontLeft.setPower(adjustedPower);
-        driveSystem.motorFrontRight.setPower(adjustedPower);
+        while (!isOnCrater()) {
+            correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.CRATOR);
 
-        while (driveSystem.motorFrontLeft.isBusy() ||
-                driveSystem.motorFrontRight.isBusy() ||
-                driveSystem.motorBackRight.isBusy() ||
-                driveSystem.motorBackLeft.isBusy()) {
-
-            if ((getDistance1() <= closeBuffer) ||
-                    (getDistance2() <= closeBuffer) ||
-                    (getDistance1() >= farBuffer) ||
-                    (getDistance2() >= farBuffer)) {
-                telemetry.log("driveTest", "distance buffer triggered");
-
-                while ((getDistance1() >= farBuffer) ||
-                        (getDistance2() >= farBuffer) ||
-                        (getDistance1() <= closeBuffer) ||
-                        (getDistance2() <= closeBuffer)) {
-
-                    double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, power);
-                    double leftPower = correctionPowers[0];
-                    double rightPower = correctionPowers[1];
-
-                    telemetry.log("driveTest", "leftPowerCorrect: " + leftPower);
-                    telemetry.log("driveTest", "rightPowerCorrect: " + rightPower);
-                    driveSystem.tankDrive(leftPower, rightPower);
-                }
-            }
-
-            if (isOnCrater()) {
-                break;
-            }
-
+            telemetry.log("DistanceSystem","scaled power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
-            telemetry.log("driveTest", "standard old power: " + adjustedPower);
             telemetry.write();
         }
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
+        driveSystem.setPower(0);
+        telemetry.log("DistanceSystem","reached crator");
+        telemetry.write();
     }
 
     public void driveAlongWallToDepot(double closeBuffer, double farBuffer, double power) {
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
+        driveSystem.setPower(0);
 
-        driveSystem.motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveSystem.motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveSystem.motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveSystem.motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         double adjustedPower = Range.clip(power, -1.0, 1.0);
+        driveSystem.setPower(adjustedPower);
 
-        driveSystem.motorBackRight.setPower(adjustedPower);
-        driveSystem.motorBackLeft.setPower(adjustedPower);
-        driveSystem.motorFrontLeft.setPower(adjustedPower);
-        driveSystem.motorFrontRight.setPower(adjustedPower);
+        while (!isInDepot()) {
+            correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.CRATOR);
 
-        while (driveSystem.motorFrontLeft.isBusy() ||
-                driveSystem.motorFrontRight.isBusy() ||
-                driveSystem.motorBackRight.isBusy() ||
-                driveSystem.motorBackLeft.isBusy()) {
-
-            if ((getDistance1() <= closeBuffer) ||
-                    (getDistance2() <= closeBuffer) ||
-                    (getDistance1() >= farBuffer) ||
-                    (getDistance2() >= farBuffer)) {
-                telemetry.log("driveTest", "distance buffer triggered");
-
-                driveSystem.motorBackRight.setPower(adjustedPower);
-                driveSystem.motorBackLeft.setPower(adjustedPower);
-                driveSystem.motorFrontLeft.setPower(adjustedPower);
-                driveSystem.motorFrontRight.setPower(adjustedPower);
-
-                driveSystem.setPower(0);
-
-                while ((getDistance1() >= farBuffer) ||
-                        (getDistance2() >= farBuffer) ||
-                        (getDistance1() <= closeBuffer) ||
-                        (getDistance2() <= closeBuffer)) {
-
-                    double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, power);
-                    double leftPower = correctionPowers[0];
-                    double rightPower = correctionPowers[1];
-
-                    driveSystem.tankDrive(leftPower, rightPower);
-                }
-            }
-
-            if (isInDepot()) {
-                break;
-            }
-
+            telemetry.log("DistanceSystem","scaled power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
             telemetry.write();
         }
-        driveSystem.motorBackLeft.setPower(0);
-        driveSystem.motorBackRight.setPower(0);
-        driveSystem.motorFrontRight.setPower(0);
-        driveSystem.motorFrontLeft.setPower(0);
+        driveSystem.setPower(0);
+        telemetry.log("DistanceSystem","reached depot");
+        telemetry.write();
+    }
+
+    public void getCloseToWall(double targetDistanceFromWall, double power) {
+        driveSystem.setPower(power);
+
+        while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
+            driveSystem.setPower(power);
+        }
+        driveSystem.setPower(0);
     }
 
     public double[] getCorrectionTurnPower(double closeBuffer, double farBuffer, double power) {
         double turnPower = (power / 2);
         double rightPower = turnPower;
         double leftPower = turnPower;
-        if (((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) ||
-                ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
+        if ((((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) && !(getDistance2() >= farBuffer)) ||
+                ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
             if (power > 0) {
                 telemetry.log("driveTest", "turning RIGHT");
                 rightPower = 0;
@@ -298,8 +230,8 @@ public class DistanceSystem extends System {
                 rightPower = turnPower;
                 leftPower = 0;
             }
-        } else if (((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) ||
-                ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
+        } else if ((((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer))) ||
+                ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
             if (power > 0) {
                 telemetry.log("driveTest", "turning LEFT");
                 rightPower = turnPower;
@@ -327,33 +259,7 @@ public class DistanceSystem extends System {
                 (colorSystem.getBlue() < blueTriggerValue));
     }
 
-    /* if ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer)) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        } else {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        }
-                    } else if ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer)) {
-                        if (power > 0) {
-                            telemetry.log("driveTest", "turning RIGHT");
-                            rightPower = 0;
-                            leftPower = turnPower;
-                        } else {
-                            telemetry.log("driveTest", "turning LEFT");
-                            rightPower = turnPower;
-                            leftPower = 0;
-                        }
-                    } else if ((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) {
-                        telemetry.log("driveTest", "turning RIGHT");
-                        rightPower = 0;
-                        leftPower = turnPower;
-                    } else if ((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer)) {
-                        telemetry.log("driveTest", "turning LEFT");
-                        rightPower = turnPower;
-                        leftPower = 0;
-                    }*/
+    private enum StopCondition {
+        DISTANCE, DEPOT, CRATOR;
+    }
 }

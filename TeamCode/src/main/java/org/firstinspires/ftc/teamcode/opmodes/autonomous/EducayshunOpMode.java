@@ -2,11 +2,9 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
-import org.firstinspires.ftc.teamcode.systems.base.DriveSystem4Wheel;
-
 @Autonomous(name = "EducayshunOpMode", group = "Bot")
 public class EducayshunOpMode extends BaseAutonomousOpMode {
+    private final String TAG = "EducationOpMode";
 
     public EducayshunOpMode() {
         super("EducayshunOpMode");
@@ -18,47 +16,45 @@ public class EducayshunOpMode extends BaseAutonomousOpMode {
 
         telem("About to initialize systems.", 0.25);
         this.initSystems();
-        telem("Initialized all systems. Ready." + ("" + disSys), 0.25);
+        telem("Initialized all systems. Ready." + ("" + distanceSystem), 0.25);
 
         ////
         waitForStart();
         ////
 
-        //disSys.driveAlongWallInches(60, 3, 6, 1);
+        distanceSystem.getCloseToWall(7, -0.7);
 
-        disSys.driveAlongWallToCrater(3, 6, 1);
+        sleep(8000);
+        telemetry.addLine("reached wall");
+        telemetry.update();
 
-        //driveSystem.driveToPositionInches(30, 1.0);
+        distanceSystem.driveAlongWallToCrater(3, 6, 1);
 
-        //driveSystem.turn(90, 1);
+        sleep(3000);
 
-        /*driveSystem.motorFrontLeft.setPower(1);
-        sleep(1000);
-        driveSystem.motorFrontLeft.setPower(0);
-        sleep(1000);
-        driveSystem.motorFrontRight.setPower(1);
-        sleep(1000);
-        driveSystem.motorFrontRight.setPower(0);
-        sleep(1000);
-        driveSystem.motorBackRight.setPower(1);
-        sleep(1000);
-        driveSystem.motorBackRight.setPower(0);
-        sleep(1000);
-        driveSystem.motorBackLeft.setPower(1);
-        sleep(1000);
-        driveSystem.motorBackLeft.setPower(0);
-        sleep(1000);*/
+        distanceSystem.driveAlongWallToDepot(3, 6, -1);
 
-        //driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);
-        //driveSystem.setPower(0.8);
-        //sleep(5000);
 
+        //driveSystem.driveToPositionInches(30, 1);
+
+        /*int ticksLeft = 3000;
+        ExponentialRamp ramp = new ExponentialRamp(new Point(0, 0.1), new Point(ticksLeft, 1));
+
+        int counts = 6;
+        for (int i = 0; i < counts; i++) {
+            telemetry.addLine("ticksLeft: " + ticksLeft);
+            telemetry.addLine("rampX: " + ramp.scaleX(ticksLeft));
+            telemetry.update();
+            ticksLeft -= (ticksLeft / 6);
+            sleep(1000);
+        }*/
 
 
         //driveSystem.driveToPositionInches(15, 1);
 
-        /*for (int i = 0; i < 5000; i++) {
-            disSys.telemetry();
+        /*for (int i = 0; i < 50000; i++) {
+            //distanceSystem.telemetry();
+            colorSystem.telemetry();
             sleep(10);
         }*/
 
