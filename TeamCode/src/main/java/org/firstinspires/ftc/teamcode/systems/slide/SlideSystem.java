@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
  */
 public class SlideSystem extends System
 {
-    private final double WinchPower = -0.2;
+    private final double WinchPower = -0.7;
 
     private DigitalChannel limitTop;
     private DigitalChannel limitMiddle;
