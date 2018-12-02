@@ -418,4 +418,47 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public enum MecanumDriveDirection {
         STRAFE_RIGHT, STRAFE_LEFT;
     }
+
+    /**
+     * Drives using the Gyro System. Optimized for strafing.
+     * When using this in a loop, keep the return value stored, then when you call it again, input the previous return value into the desired heading field.
+     * @param rightX X position of right controller stick
+     * @param rightY Y position of right controller stick
+     * @param leftX X position of left controller stick
+     * @param leftY Y position of left controller stick
+     * @param desiredHeading The desired heading
+     * @return
+     */
+    public double driveWithGyroSystem(float rightX, float rightY, float leftX, float leftY, double desiredHeading) {
+        double rightPower = Range.clip(leftY + rightX, -1.0, 1.0) ;
+        double leftPower = Range.clip(leftY - rightX, -1.0, 1.0) ;
+
+        if(Math.abs(leftPower) < 0.12) {
+            leftPower = 0.0;
+        }
+        if(Math.abs(rightPower) < 0.12) {
+            rightPower = 0.0;
+        }
+        if(Math.abs(leftX) < 0.12) {
+            leftX = 0.0f;
+        }
+
+        double modifier;
+        if(leftX != 0.0) {
+            modifier = (desiredHeading - imuSystem.getHeading()) / 23;
+        } else {
+            desiredHeading = imuSystem.getHeading();
+            modifier = 0.0;
+        }
+
+        motorFrontLeft.setPower(leftPower - leftX + modifier);
+        motorFrontRight.setPower(rightPower + leftX - modifier);
+        motorBackLeft.setPower(leftPower + leftX + modifier);
+        motorBackRight.setPower(rightPower - leftX - modifier);
+
+        telemetry.log("Heading", imuSystem.getHeading());
+        telemetry.write();
+
+        return desiredHeading;
+    }
 }
