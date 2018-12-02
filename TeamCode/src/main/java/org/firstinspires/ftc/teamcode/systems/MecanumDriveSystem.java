@@ -77,6 +77,39 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         telemetry.write();
     }
 
+    public double driveWithGyroSystem(float rightX, float rightY, float leftX, float leftY, double desiredHeading) { // When using this in a loop, keep the return value stored, then call it again with the previous return value. Set strafe to negative for left, positive for right. Strafe should be between -1.0 and 1.0
+        double rightPower = Range.clip(leftY + rightX, -1.0, 1.0) ;
+        double leftPower = Range.clip(leftY - rightX, -1.0, 1.0) ;
+
+        if(Math.abs(leftPower) < 0.12) {
+            leftPower = 0.0;
+        }
+        if(Math.abs(rightPower) < 0.12) {
+            rightPower = 0.0;
+        }
+        if(Math.abs(leftX) < 0.12) {
+            leftX = 0.0f;
+        }
+
+        double modifier;
+        if(leftX != 0.0) {
+            modifier = (desiredHeading - imuSystem.getHeading()) / 23;
+        } else {
+            desiredHeading = imuSystem.getHeading();
+            modifier = 0.0;
+        }
+
+        motorFrontLeft.setPower(leftPower - leftX + modifier);
+        motorFrontRight.setPower(rightPower + leftX - modifier);
+        motorBackLeft.setPower(leftPower + leftX + modifier);
+        motorBackRight.setPower(rightPower - leftX - modifier);
+
+        telemetry.log("Heading", imuSystem.getHeading());
+        telemetry.write();
+
+        return desiredHeading;
+    }
+
     private float scaleJoystickValue(float joystickValue) {
         return joystickValue > 0
                 ? (float)JOYSTICK_SCALE.scaleX(joystickValue * joystickValue)
@@ -335,38 +368,5 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     public enum MecanumDriveDirection {
         STRAFE_RIGHT, STRAFE_LEFT;
-    }
-
-    public double driveWithGyroSystem(double desiredHeading, double drive, double turn, double strafe) { // When using this in a loop, keep the return value stored, then call it again with the previous return value. Set strafe to negative for left, positive for right. Strafe should be between -1.0 and 1.0
-        double rightPower = Range.clip(drive + turn, -1.0, 1.0) ;
-        double leftPower = Range.clip(drive - turn, -1.0, 1.0) ;
-
-        if(Math.abs(leftPower) < 0.12) {
-            leftPower = 0.0;
-        }
-        if(Math.abs(rightPower) < 0.12) {
-            rightPower = 0.0;
-        }
-        if(Math.abs(strafe) < 0.12) {
-            strafe = 0.0;
-        }
-
-        double modifier;
-        if(Math.abs(strafe) != 0.0) {
-            modifier = (desiredHeading - imuSystem.getHeading()) / 30;
-        } else {
-            desiredHeading = imuSystem.getHeading();
-            modifier = 0.0;
-        }
-
-        motorFrontLeft.setPower(leftPower - strafe + modifier);
-        motorFrontRight.setPower(rightPower + strafe - modifier);
-        motorBackLeft.setPower(leftPower + strafe + modifier);
-        motorBackRight.setPower(rightPower - strafe - modifier);
-
-        telemetry.log("Heading", imuSystem.getHeading());
-        telemetry.write();
-
-        return desiredHeading;
     }
 }
