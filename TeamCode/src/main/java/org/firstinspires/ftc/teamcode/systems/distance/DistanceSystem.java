@@ -130,7 +130,7 @@ public class DistanceSystem extends System {
         while (isOutOfBounds(closeBuffer, farBuffer)) {
             telemetry.log("driveTest", "isOutOfBounds");
 
-            boolean reachedStopCondition = false;
+            /*boolean reachedStopCondition = false;
             switch (stopCondition) {
                 case DISTANCE:
                     reachedStopCondition = (driveSystem.getMinDistanceFromTarget() < 50);
@@ -144,7 +144,7 @@ public class DistanceSystem extends System {
             }
             if (reachedStopCondition) {
                 break;
-            }
+            }*/
 
             double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, correctionPower);
             double leftPower = correctionPowers[0];

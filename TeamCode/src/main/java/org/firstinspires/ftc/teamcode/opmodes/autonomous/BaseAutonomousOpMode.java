@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.distance.DistanceSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
+import org.firstinspires.ftc.teamcode.systems.marker.Marker;
 
 /**
  * Created by EvanCoulson on 10/11/17.
@@ -19,6 +20,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public IMUSystem imuSystem;
     public ColorSystem colorSystem;
     public DistanceSystem distanceSystem;
+    public Marker markerSystem;
 
     public BaseAutonomousOpMode(String opModeName)
     {
@@ -32,5 +34,6 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         this.imuSystem = new IMUSystem(this);
         colorSystem = new ColorSystem(this);
         distanceSystem = new DistanceSystem(this, driveSystem, colorSystem);
+        markerSystem = new Marker(this);
     }
 }

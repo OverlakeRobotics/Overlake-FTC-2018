@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.components.scale.IScale;
 import org.firstinspires.ftc.teamcode.components.scale.LinearScale;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 
 import java.util.Arrays;
@@ -34,6 +35,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public IMUSystem imuSystem;
 
     private double initialHeading;
+    private double initPitch;
+    private double initRoll;
 
     private boolean slowDrive;
 
@@ -53,6 +56,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
         imuSystem = new IMUSystem(opMode);
         initialHeading = imuSystem.getHeading();
+        initPitch = imuSystem.getPitch();
+        initRoll = imuSystem.getRoll();
 
         telemetry.log("MecanumDriveSystem","power: {0}", 0);
         telemetry.log("MecanumDriveSystem","distance: {0}", 0);
@@ -195,8 +200,12 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     }
 
     public void driveToPositionInches(int inches, double power, boolean shouldRamp) {
+        if (power <= 0) {
+            setDirection(DriveDirection.FORWARD);
+        } else {
+            setDirection(DriveDirection.BACKWARD);
+        }
         int ticks = (int) inchesToTicks(inches);
-        setDirection(DriveDirection.FORWARD);
         driveToPositionTicks(ticks, power, shouldRamp);
     }
 
@@ -316,6 +325,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
      * @param initialHeading The initial starting point
      */
     private void turn(double degrees, double maxPower, double initialHeading) {
+        setDirection(DriveDirection.FORWARD);
 
         double heading = -initialHeading;
         double targetHeading = 0;
@@ -365,6 +375,31 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     private double computeDegreesDiff(double targetHeading, double heading) {
         return targetHeading - heading;
+    }
+
+    public void parkInDepot(double maxPower, ColorSystem colorSystem) {
+        int redTriggerValue = 12;
+        int blueTriggerValue = 8;
+        setDirection(DriveDirection.FORWARD);
+        setPower(maxPower);
+
+        while ((colorSystem.getRed() < redTriggerValue) &&
+                (colorSystem.getBlue() < blueTriggerValue)) {
+            setPower(maxPower);
+        }
+        setPower(0);
+    }
+
+    public void parkOnCrator(double maxPower) {
+        double criticalAngle = 1.5;
+        setDirection(DriveDirection.FORWARD);
+        setPower(maxPower);
+
+        while (((Math.abs(imuSystem.getPitch() - initPitch) < criticalAngle) ||
+                (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle))) {
+            setPower(maxPower);
+        }
+        setPower(0);
     }
 
     public void setDirection(MecanumDriveDirection direction) {
