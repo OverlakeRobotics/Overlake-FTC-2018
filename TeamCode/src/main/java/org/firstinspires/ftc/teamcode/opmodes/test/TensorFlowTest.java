@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp(name = "TensorFlowTest")
-public class fTensorFlowTest extends LinearOpMode {
+public class TensorFlowTest extends LinearOpMode {
     //private TensorFlowSystem tensorFlow = new TensorFlowSystem(this);
 
     public void runOpMode() {

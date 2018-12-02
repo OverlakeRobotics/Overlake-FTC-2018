@@ -35,11 +35,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
+import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
 import java.util.List;
@@ -171,7 +168,7 @@ public class TensorFlowSystem extends LinearOpMode {
             drive(0, 0.2, 75);
         } else {
             Log.i(TAG, "driving forward to hit gold -- gold seen");
-            driveSystem.turn(-90, 0.5);
+            driveSystem.turn(-90);
             drive(0, 0.5, 1500);
             hasDriven = true;
         }

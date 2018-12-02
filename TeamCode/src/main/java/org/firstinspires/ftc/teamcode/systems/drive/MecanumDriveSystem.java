@@ -149,6 +149,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
      * @param y Y value of the joystick
      */
     public void mecanumDriveXY(double x, double y) {
+        telemetry.log("MecanumDrive", "in driveXY");
+        telemetry.write();
         this.motorFrontRight.setPower(Range.clip(y + x, -1, 1));
         this.motorBackRight.setPower(Range.clip(y - x, -1, 1));
         this.motorFrontLeft.setPower(Range.clip(y - x, -1, 1));
@@ -310,7 +312,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     /**
      * Turns the robot by a given amount of degrees using the current heading
      * @param degrees The degrees to turn the robot by
-     * @param maxPower The maximum power of the motors
+     *
      */
     public void turn(double degrees, double maxPower) {
         turn(degrees, maxPower, imuSystem.getHeading());
