@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.components.scale.LogarithmicRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
@@ -18,13 +19,14 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
 public class ArmSystem extends System {
     private DcMotor motor1;
     private DcMotor motor2;
+    private Servo armRelease;
     private AnalogInput potentiometer;
     private Ramp rampUp;
     private Ramp rampDown;
 
     private final double PotentiometerMaximum = 1.9;
     private final double PotentiometerMinimum = 0.8;
-    private final double MaxPower = 0.3;
+    private final double MaxPower = 0.2;
     private final double MinPower = 0.01;
 
     private ArmState currentState;
@@ -35,8 +37,9 @@ public class ArmSystem extends System {
      */
     public ArmSystem(OpMode opMode) {
         super(opMode, "ArmSystem");
-        motor1 = hardwareMap.dcMotor.get( "parallelM1");
-        motor2 = hardwareMap.dcMotor.get( "parallelM2");
+        motor1 = hardwareMap.dcMotor.get("parallelM1");
+        motor2 = hardwareMap.dcMotor.get("parallelM2");
+        armRelease = hardwareMap.servo.get("armRelease");
         potentiometer = hardwareMap.get(AnalogInput.class, "potentiometer");
         setState(ArmState.IDLE);
         rampUp = new LogarithmicRamp(
@@ -64,6 +67,9 @@ public class ArmSystem extends System {
         telemetry.log("voltage", potentiometer.getVoltage());
         telemetry.write();
         switch (currentState) {
+            case RELEASE_PIN:
+                releaseArmPin();
+                break;
             case ROTATING_TOP:
                 rotateTop();
                 break;
@@ -127,5 +133,13 @@ public class ArmSystem extends System {
         setState(ArmState.IDLE);
         motor1.setPower(0);
         motor2.setPower(0);
+    }
+
+    /**
+     * Releases the pin of that holds the arm up when latching
+     */
+    public void releaseArmPin() {
+        armRelease.setPosition(0.9);
+        setState(ArmState.IDLE);
     }
 }
