@@ -30,6 +30,7 @@ public class ArmSystem extends System {
     private final double MinPower = 0.01;
 
     private ArmState currentState;
+    private double latchVoltage;
 
     /**
      * Builds a new Arm System for the given opmode
@@ -75,6 +76,9 @@ public class ArmSystem extends System {
                 break;
             case ROTATING_BOTTOM:
                 rotateBottom();
+                break;
+            case FALLING:
+                slowFall();
                 break;
             default:
                 stop();
@@ -139,7 +143,8 @@ public class ArmSystem extends System {
      * Releases the pin of that holds the arm up when latching
      */
     public void releaseArmPin() {
-        armRelease.setPosition(0.9);
+        latchVoltage = potentiometer.getVoltage();
+        armRelease.setPosition(0);
         setState(ArmState.IDLE);
     }
 
@@ -147,7 +152,24 @@ public class ArmSystem extends System {
      * Sets the pin of that holds the arm up when latching
      */
     public void setArmPin() {
-        armRelease.setPosition(0.4);
+        armRelease.setPosition(0.7);
         setState(ArmState.IDLE);
+    }
+
+    /**
+     *
+     */
+    public void slowFall() {
+        //Ramp ramp = new LogarithmicRamp(new Point(0.0001, 0), new Point(latchVoltage, MaxPower));
+        if (!hasHitFloor()) {
+            motor1.setPower(0.2);
+            motor2.setPower(-0.2);
+        } else {
+            setState(ArmState.RELEASE_PIN);
+        }
+    }
+
+    private boolean hasHitFloor() {
+        return potentiometer.getVoltage() >= 1.8 && potentiometer.getVoltage() <= 2.0;
     }
 }

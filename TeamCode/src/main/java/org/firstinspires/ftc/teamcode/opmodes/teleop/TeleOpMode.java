@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleOp;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -125,13 +125,13 @@ public class TeleOpMode extends TeleOpModeDebugger {
                 armSystem.setState(ArmState.IDLE);
             }
         };
-        controller1.leftStickButton.pressedHandler = new Handler() {
+        controller1.x.pressedHandler = new Handler() {
             @Override
             public void invoke() throws Exception {
-                armSystem.releaseArmPin();
+                armSystem.setState(ArmState.RELEASE_PIN);
             }
         };
-        controller1.rightStickButton.pressedHandler = new Handler() {
+        controller1.y.pressedHandler = new Handler() {
             @Override
             public void invoke() throws Exception {
                 armSystem.setArmPin();
