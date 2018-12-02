@@ -45,9 +45,9 @@ public class CraterOpMode extends LinearOpMode {
     }
 
     private void initializeOpMode() {
-        driveSystem = new MecanumDriveSystem(CraterOpMode);
+        driveSystem = new MecanumDriveSystem(this);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            tensorFlow = new TensorFlow(CraterOpMode);
+            tensorFlow = new TensorFlow(this);
             tensorFlow.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL);
             tensorFlow.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_SILVER_MINERAL);
         } else {
@@ -93,7 +93,7 @@ public class CraterOpMode extends LinearOpMode {
             }
         }
 
-        if (hasFoundGoldMineral(goldMineralX)) {
+        if (!hasFoundGoldMineral(goldMineralX)) {
             handleSilverMineralWhenFound(silverMineral1X, silverMineral2X);
         } else {
             handleGoldMineralWhenFound(goldMineralX);
@@ -125,11 +125,11 @@ public class CraterOpMode extends LinearOpMode {
         if (goldMineralX < SCREEN_CENTER - OFFSET) {
             // strafe right to center gold
             Log.i(TAG, "strafing right to center gold");
-            driveStrafe(0, -0.2, 75);
+            driveStrafe(0, -0.2, 500);
         } else if (goldMineralX > SCREEN_CENTER + OFFSET) {
             // strafe left to center gold
             Log.i(TAG, "strafing left to center gold");
-            driveStrafe(0, 0.2, 75);
+            driveStrafe(0, 0.2, 500);
         } else {
             Log.i(TAG, "driving forward to hit gold -- gold seen");
             driveSystem.turn(-90, 0.5);
@@ -147,7 +147,7 @@ public class CraterOpMode extends LinearOpMode {
     private void driveToCrater() {
         hasDriven = true;
         armSystem.rotatePickup();
-        driveSystem.driveToPositionInches(DISTANCE_TO_CRATER);
+        driveSystem.driveToPositionInches(DISTANCE_TO_CRATER, 0.3);
     }
 
     private boolean hasFoundGoldMineral(int goldMineralX) {

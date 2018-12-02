@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.systems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
@@ -33,7 +34,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     private boolean slowDrive;
 
-    public MecanumDriveSystem(String opMode) {
+    public MecanumDriveSystem(OpMode opMode) {
         super(opMode, "MecanumDrive");
 
         //this.config = new ConfigParser("Testy.omc");
@@ -46,10 +47,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
         telemetry.log("MecanumDriveSystem","power: {0}", 0);
         telemetry.log("MecanumDriveSystem","distance: {0}", 0);
-    }
-
-    public MecanumDriveSystem(Object craterOpMode) {
-        super(craterOpMode);
     }
 
     // test
@@ -149,7 +146,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         mecanumDriveXY(x, y);
     }
 
-    public void driveToPositionInches(int inches) {
+    public void driveToPositionInches(int inches, double power) {
         int ticks = (int) inchesToTicks(inches);
         setDirection(DriveDirection.FORWARD);
         driveToPositionTicks(ticks, power);
