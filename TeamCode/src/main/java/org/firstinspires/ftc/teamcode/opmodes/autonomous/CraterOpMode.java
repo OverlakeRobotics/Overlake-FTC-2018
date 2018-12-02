@@ -122,20 +122,20 @@ public class CraterOpMode extends LinearOpMode {
         if (goldMineralX < SCREEN_CENTER - OFFSET) {
             // strafe right to center gold
             Log.i(TAG, "strafing right to center gold");
-            driveStrafe(0, -0.2, 75);
+            driveAndCenterRobot(0, -0.2, 75);
         } else if (goldMineralX > SCREEN_CENTER + OFFSET) {
             // strafe left to center gold
             Log.i(TAG, "strafing left to center gold");
-            driveStrafe(0, 0.2, 75);
+            driveAndCenterRobot(0, 0.2, 75);
         } else {
             Log.i(TAG, "driving forward to hit gold -- gold seen");
-            driveSystem.turn(-90);
+            driveSystem.turn(-90, 0.8);
             driveToCrater();
             hasDriven = true;
         }
     }
 
-    private void driveStrafe(double x, double y, int miliseconds) {
+    private void driveAndCenterRobot(double x, double y, int miliseconds) {
         driveSystem.mecanumDriveXY(x, y);
         sleep(miliseconds);
         driveSystem.mecanumDriveXY(0, 0);

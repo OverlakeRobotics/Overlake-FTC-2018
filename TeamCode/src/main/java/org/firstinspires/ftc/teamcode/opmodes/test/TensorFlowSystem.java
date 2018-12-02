@@ -168,7 +168,7 @@ public class TensorFlowSystem extends LinearOpMode {
             drive(0, 0.2, 75);
         } else {
             Log.i(TAG, "driving forward to hit gold -- gold seen");
-            driveSystem.turn(-90);
+            driveSystem.turn(-90, 0.8);
             drive(0, 0.5, 1500);
             hasDriven = true;
         }
