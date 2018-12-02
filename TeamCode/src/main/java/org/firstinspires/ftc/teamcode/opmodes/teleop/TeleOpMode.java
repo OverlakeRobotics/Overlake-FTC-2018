@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.hardware.controller.Handler;
 import org.firstinspires.ftc.teamcode.opmodes.debuggers.TeleOpModeDebugger;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
+import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.flail.Flail;
 import org.firstinspires.ftc.teamcode.systems.slide.SlideState;
 import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
@@ -98,7 +98,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
             @Override
             public void invoke() throws Exception
             {
-                armSystem.setState(ArmState.ROTATING_PICKUP);
+                armSystem.setState(ArmState.ROTATING_BOTTOM);
             }
         };
         controller1.dPadDown.releasedHandler = new Handler()
@@ -114,7 +114,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
             @Override
             public void invoke() throws Exception
             {
-                armSystem.setState(ArmState.ROTATING_DROP);
+                armSystem.setState(ArmState.ROTATING_TOP);
             }
         };
         controller1.dPadUp.releasedHandler = new Handler()
@@ -123,6 +123,18 @@ public class TeleOpMode extends TeleOpModeDebugger {
             public void invoke() throws Exception
             {
                 armSystem.setState(ArmState.IDLE);
+            }
+        };
+        controller1.leftStickButton.pressedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.releaseArmPin();
+            }
+        };
+        controller1.rightStickButton.pressedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setArmPin();
             }
         };
     }

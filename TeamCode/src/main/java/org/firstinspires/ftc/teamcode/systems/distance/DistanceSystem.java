@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
-import org.firstinspires.ftc.teamcode.systems.MecanumDriveSystem;
-import org.firstinspires.ftc.teamcode.systems.base.DriveSystem4Wheel;
+import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
+import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 import org.firstinspires.ftc.teamcode.systems.base.System;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
@@ -38,7 +38,7 @@ public class DistanceSystem extends System {
         colorSystem= cs;
         initSystem();
 
-        initPitch = imu.getpitch();
+        initPitch = imu.getPitch();
         initRoll = imu.getRoll();
     }
 
@@ -248,7 +248,7 @@ public class DistanceSystem extends System {
 
     public boolean isOnCrater() {
         double criticalAngle = 1.5;
-        return ((Math.abs(imu.getpitch() - initPitch) < criticalAngle) ||
+        return ((Math.abs(imu.getPitch() - initPitch) < criticalAngle) ||
                 (Math.abs(imu.getRoll() - initRoll) < criticalAngle));
     }
 
