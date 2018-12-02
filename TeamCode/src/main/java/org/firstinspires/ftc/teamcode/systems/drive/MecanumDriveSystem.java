@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.systems.drive;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
@@ -17,8 +19,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 {
     private ConfigParser config;
 
-    public double TICKS_IN_INCH;
-    public double TICKS_IN_INCH_STRAFE;
+    public int TICKS_IN_INCH;
+    public int TICKS_IN_INCH_STRAFE;
     private final IScale JOYSTICK_SCALE = new LinearScale(0.62, 0);
     private static double TURN_RAMP_POWER_CUTOFF = 0.1;
     public static double RAMP_POWER_CUTOFF;
@@ -68,10 +70,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         leftY = scaleJoystickValue(leftY);
 
         // write the values to the motors 1
-        double frontRightPower = -leftY - leftX - rightX;
-        double backRightPower = -leftY + leftX + rightX;
-        double frontLeftPower = -leftY + leftX - rightX;
-        double backLeftPower = -leftY - leftX + rightX;
+        double frontRightPower = -leftY + leftX - rightX;
+        double backRightPower = -leftY - leftX - rightX;
+        double frontLeftPower = -leftY - leftX + rightX;
+        double backLeftPower = -leftY + leftX + rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
         telemetry.log("Mecanum Drive System","FRpower: {0}", Range.clip(frontRightPower, -1, 1));
@@ -260,6 +262,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
             double scaledPower = ramp.scaleX(distance);
             telemetry.log("MecanumDriveSystem","power: " + scaledPower);
             setPower(direction * scaledPower);
+            telemetry.log("MecanumDriveSystem","power motorFL: " + this.motorFrontLeft.getPower());
+            telemetry.log("MecanumDriveSystem","power motorFR: " + this.motorFrontRight.getPower());
+            telemetry.log("MecanumDriveSystem","power motorBL: " + this.motorBackLeft.getPower());
+            telemetry.log("MecanumDriveSystem","power motorBR: " + this.motorBackRight.getPower());
             telemetry.write();
         }
         motorBackLeft.setPower(0);
@@ -285,7 +291,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
      * @param inches Inches to convert to ticks
      * @return
      */
-    public double inchesToTicks(int inches) {
+    public int inchesToTicks(int inches) {
         return inches * TICKS_IN_INCH;
     }
 
@@ -392,16 +398,16 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public void setDirection(MecanumDriveDirection direction) {
         switch (direction){
             case STRAFE_LEFT:
-                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
                 motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 break;
             case STRAFE_RIGHT:
-                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
         }
     }

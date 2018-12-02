@@ -56,6 +56,13 @@ public abstract class DriveSystem4Wheel extends System
         this.motorBackRight.setPower(power);
     }
 
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+        this.motorFrontLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        this.motorFrontRight.setZeroPowerBehavior(zeroPowerBehavior);
+        this.motorBackLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        this.motorBackRight.setZeroPowerBehavior(zeroPowerBehavior);
+    }
+
     /**
      * Checks if any of the motors are currently running
      * @return Returns true if any motors are busy
@@ -99,10 +106,10 @@ public abstract class DriveSystem4Wheel extends System
      * @param rightPower sets the right side power of the robot
      */
     public void tankDrive(double leftPower, double rightPower) {
-        this.motorFrontLeft.setPower(-leftPower);
+        this.motorFrontLeft.setPower(leftPower);
         this.motorBackLeft.setPower(leftPower);
         this.motorFrontRight.setPower(rightPower);
-        this.motorBackRight.setPower(-rightPower);
+        this.motorBackRight.setPower(rightPower);
     }
 
     /**
@@ -113,26 +120,20 @@ public abstract class DriveSystem4Wheel extends System
         switch (direction){
             case FORWARD:
                 motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
             case BACKWARD:
                 motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-                break;
-            case ALL_FORWARD:
+                motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 break;
         }
     }
 
     public enum DriveDirection {
-        FORWARD, BACKWARD, ALL_FORWARD;
+        FORWARD, BACKWARD;
     }
 }
