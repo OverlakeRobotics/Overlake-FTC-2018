@@ -22,8 +22,8 @@ public class ArmSystem extends System {
     private Ramp rampUp;
     private Ramp rampDown;
 
-    private final double PotentiometerMaximum = 1.1;
-    private final double PotentiometerMinimum = 0.01;
+    private final double PotentiometerMaximum = 1.9;
+    private final double PotentiometerMinimum = 0.8;
     private final double MaxPower = 0.3;
     private final double MinPower = 0.01;
 
@@ -61,6 +61,8 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
+        telemetry.log("voltage", potentiometer.getVoltage());
+        telemetry.write();
         switch (currentState) {
             case ROTATING_TOP:
                 rotateTop();
