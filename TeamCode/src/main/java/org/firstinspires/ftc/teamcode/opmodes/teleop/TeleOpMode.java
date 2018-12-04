@@ -55,6 +55,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
         addWinchButton();
         addRotateButton();
         addFlailButton();
+        addSlowDriveButton();
     }
 
     private void addWinchButton() {

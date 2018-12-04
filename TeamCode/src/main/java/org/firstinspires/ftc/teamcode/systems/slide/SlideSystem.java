@@ -17,12 +17,14 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
  */
 public class SlideSystem extends System
 {
-    private final double WinchPower = -0.7;
+    private final double MaxWinchPower = -0.7;
+    private final int EncoderTop = 0;
 
     private DigitalChannel limitTop;
     private DigitalChannel limitMiddle;
     private DcMotor winch;
-
+    private Ramp rampTop;
+    private Ramp rampBottom;
     private SlideState state;
 
     private double winchOrigin;
@@ -42,6 +44,14 @@ public class SlideSystem extends System
         setState(SlideState.IDLE);
         limitTop.setMode(DigitalChannel.Mode.INPUT);
         limitMiddle.setMode(DigitalChannel.Mode.INPUT);
+        rampBottom = new ExponentialRamp(
+            new Point(0,0),
+            new Point((winchOrigin + EncoderTop) / 2, MaxWinchPower)
+        );
+        rampTop = new ExponentialRamp(
+            new Point((winchOrigin + EncoderTop) / 2, MaxWinchPower),
+            new Point(winchOrigin + EncoderTop, 0)
+        );
     }
 
     /**
@@ -77,7 +87,7 @@ public class SlideSystem extends System
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTop())
         {
-            winch.setPower(WinchPower);
+            winch.setPower(MaxWinchPower);
         }
         else
         {
@@ -101,7 +111,7 @@ public class SlideSystem extends System
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom())
         {
-            winch.setPower(-WinchPower);
+            winch.setPower(-MaxWinchPower);
         }
         else
         {

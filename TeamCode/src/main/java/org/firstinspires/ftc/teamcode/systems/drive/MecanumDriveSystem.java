@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.components.scale.IScale;
 import org.firstinspires.ftc.teamcode.components.scale.LinearScale;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 
 public class MecanumDriveSystem extends DriveSystem4Wheel
@@ -70,10 +71,15 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         leftY = scaleJoystickValue(leftY);
 
         // write the values to the motors 1
-        double frontRightPower = -leftY + leftX - rightX;
+        /*double frontRightPower = -leftY + leftX - rightX; // left stick up moves forward
         double backRightPower = -leftY - leftX - rightX;
         double frontLeftPower = -leftY - leftX + rightX;
-        double backLeftPower = -leftY + leftX + rightX;
+        double backLeftPower = -leftY + leftX + rightX;*/
+
+        double frontRightPower = leftY - leftX - rightX; // left stick up strafes toward side where
+        double backRightPower = -leftY - leftX - rightX; // arm is mounted
+        double frontLeftPower = -leftY - leftX + rightX;  // lick left knee cap daddy pimple
+        double backLeftPower = leftY - leftX + rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
         telemetry.log("Mecanum Drive System","FRpower: {0}", Range.clip(frontRightPower, -1, 1));
@@ -387,6 +393,18 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         while ((Math.abs(imuSystem.getPitch() - initPitch) < criticalAngle) &&
                 (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle)) {
             setPower(maxPower);
+        }
+        setPower(0);
+    }
+
+    public void parkInDepot(double power, ColorSystem colorSystem) {
+        int redTrig = 12;
+        int blueTrig = 8;
+        setDirection(DriveDirection.FORWARD);
+        setPower(power);
+
+        while ((colorSystem.getRed() < redTrig) && (colorSystem.getBlue() < blueTrig)) {
+            setPower(power);
         }
         setPower(0);
     }

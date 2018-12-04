@@ -24,9 +24,9 @@ public class ArmSystem extends System {
     private Ramp rampUp;
     private Ramp rampDown;
 
-    private final double PotentiometerMaximum = 1.9;
+    private final double PotentiometerMaximum = 2.3;
     private final double PotentiometerMinimum = 0.8;
-    private final double MaxPower = 0.2;
+    private final double MaxPower = 0.3;
     private final double MinPower = 0.01;
 
     private ArmState currentState;
@@ -93,8 +93,8 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom()) {
-            motor1.setPower(MaxPower);
-            motor2.setPower(-MaxPower);
+            motor1.setPower(rampDown.scaleX(potentiometer.getVoltage()));
+            motor2.setPower(-rampDown.scaleX(potentiometer.getVoltage()));
         } else {
             stop();
         }
@@ -115,8 +115,8 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTopPosition()) {
-            motor1.setPower(-MaxPower);
-            motor2.setPower(MaxPower);
+            motor1.setPower(-rampUp.scaleX(potentiometer.getVoltage()));
+            motor2.setPower(rampUp.scaleX(potentiometer.getVoltage()));
         } else {
             stop();
         }
