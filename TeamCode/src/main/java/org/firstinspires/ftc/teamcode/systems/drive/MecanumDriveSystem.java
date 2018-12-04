@@ -377,31 +377,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         return targetHeading - heading;
     }
 
-    public void parkInDepot(double maxPower, ColorSystem colorSystem) {
-        int redTriggerValue = 12;
-        int blueTriggerValue = 8;
-        setDirection(DriveDirection.FORWARD);
-        setPower(maxPower);
-
-        while ((colorSystem.getRed() < redTriggerValue) &&
-                (colorSystem.getBlue() < blueTriggerValue)) {
-            setPower(maxPower);
-        }
-        setPower(0);
-    }
-
-    public void parkOnCrator(double maxPower) {
-        double criticalAngle = 1.5;
-        setDirection(DriveDirection.FORWARD);
-        setPower(maxPower);
-
-        while (((Math.abs(imuSystem.getPitch() - initPitch) < criticalAngle) ||
-                (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle))) {
-            setPower(maxPower);
-        }
-        setPower(0);
-    }
-
     public void setDirection(MecanumDriveDirection direction) {
         switch (direction){
             case STRAFE_LEFT:
