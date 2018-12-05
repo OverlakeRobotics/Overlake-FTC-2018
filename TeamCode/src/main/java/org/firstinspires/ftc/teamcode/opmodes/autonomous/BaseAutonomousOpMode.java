@@ -27,11 +27,15 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public double initRoll;
 
     public int zone;
-    public int backCubeIn;
-    public int approachDeg0;
-    public int approachDeg1;
+    public int backCubeIn; // the inches to back up after knocking the cube
+    public int approachDeg0; //the angle at which the robot approaches the wall after tensor flow
+    public int approachDeg1; // reletive to starting position
     public int approachDeg2;
     public double targDist1;
+
+    public double CRITICAL_ANGLE;
+    int RED_TRGGER_VALUE = 12;
+    int BLUE_TRIGGER_VALUE = 8;
 
     public BaseAutonomousOpMode(String opModeName)
     {
@@ -60,25 +64,22 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     }
 
     public void parkInDepot(double maxPower, ColorSystem colorSystem) {
-        int redTriggerValue = 12;
-        int blueTriggerValue = 8;
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
         driveSystem.setPower(maxPower);
 
-        while ((colorSystem.getRed() < redTriggerValue) &&
-                (colorSystem.getBlue() < blueTriggerValue)) {
+        while ((colorSystem.getRed() < RED_TRGGER_VALUE) &&
+                (colorSystem.getBlue() < BLUE_TRIGGER_VALUE)) {
             driveSystem.setPower(maxPower);
         }
         driveSystem.setPower(0);
     }
 
     public void parkOnCrator(double maxPower, double initPitch, double initRoll) {
-        double criticalAngle = 1.5;
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
         driveSystem.setPower(maxPower);
 
-        while (((Math.abs(imuSystem.getPitch() - initPitch) < criticalAngle) ||
-                (Math.abs(imuSystem.getRoll() - initRoll) < criticalAngle))) {
+        while (((Math.abs(imuSystem.getPitch() - initPitch) < CRITICAL_ANGLE) ||
+                (Math.abs(imuSystem.getRoll() - initRoll) < CRITICAL_ANGLE))) {
             driveSystem.setPower(maxPower);
         }
         driveSystem.setPower(0);
