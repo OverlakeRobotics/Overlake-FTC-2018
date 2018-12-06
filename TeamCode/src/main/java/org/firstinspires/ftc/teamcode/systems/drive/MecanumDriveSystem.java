@@ -158,20 +158,6 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         motorBackRight.setPower(backRight);
     }
 
-    private void clampPowers(List<Double> powers) {
-        double minPower = Collections.min(powers);
-        double maxPower = Collections.max(powers);
-        double maxMag = Math.max(Math.abs(minPower), Math.abs(maxPower));
-
-        if (maxMag > 1.0)
-        {
-            for (int i = 0; i < powers.size(); i++)
-            {
-                powers.set(i, powers.get(i) / maxMag);
-            }
-        }
-    }
-
     public void mecanumDriveXY(double x, double y) {
         this.motorFrontRight.setPower(Range.clip(y + x, -1, 1));
         this.motorBackRight.setPower(Range.clip(y - x, -1, 1));
@@ -200,11 +186,9 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     }
 
     public void driveToPositionInches(int inches, double power, boolean shouldRamp) {
-        if (power <= 0) {
-            setDirection(DriveDirection.FORWARD);
-        } else {
-            setDirection(DriveDirection.BACKWARD);
-        }
+        DriveDirection driveDirection = (power <= 0 || inches <= 0) ? DriveDirection.FORWARD:
+                DriveDirection.BACKWARD;
+        setDirection(driveDirection);
         int ticks = (int) inchesToTicks(inches);
         driveToPositionTicks(ticks, power, shouldRamp);
     }
@@ -349,6 +333,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
             telemetry.log("MecanumDriveSystem","power: " + power);
             telemetry.log("MecanumDriveSystem","distance left: " + Math.abs(targetHeading - heading));
             telemetry.write();
+
 
             tankDrive(power, -power);
             heading = -imuSystem.getHeading();

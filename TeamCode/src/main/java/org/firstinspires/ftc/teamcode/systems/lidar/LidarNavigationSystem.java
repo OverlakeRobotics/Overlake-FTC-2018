@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.systems.distance;
+package org.firstinspires.ftc.teamcode.systems.lidar;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 
-public class DistanceSystem extends System {
+public class LidarNavigationSystem extends System {
     DistanceSensor lidar;
     DistanceSensor lidar2;
     Rev2mDistanceSensor sensorTimeOfFlight;
@@ -30,12 +30,12 @@ public class DistanceSystem extends System {
     double initPitch;
     double initRoll;
 
-    public DistanceSystem(OpMode opMode, MecanumDriveSystem ds, ColorSystem cs) {
+    public LidarNavigationSystem(OpMode opMode, MecanumDriveSystem driveSystem, ColorSystem colorSystem) {
         super(opMode, "DriveSystem4Wheel");
         this.hwmap = opMode.hardwareMap;
-        driveSystem = ds;
+        this.driveSystem = driveSystem;
         imu = new IMUSystem(opMode);
-        colorSystem= cs;
+        this.colorSystem = colorSystem;
         initSystem();
 
         initPitch = imu.getPitch();
@@ -108,11 +108,11 @@ public class DistanceSystem extends System {
             }
 
             double scaledPower = shouldRamp ? ramp.scaleX(distance) : power;
-            telemetry.log("DistanceSystem",
+            telemetry.log("LidarNavigationSystem",
                     "ticks left (ticks): " + driveSystem.getMinDistanceFromTarget());
-            telemetry.log("DistanceSystem","scaled power: " + scaledPower);
-            telemetry.log("DistanceSystem", "distance1: " + getDistance1());
-            telemetry.log("DistanceSystem", "distance2: " + getDistance2());
+            telemetry.log("LidarNavigationSystem","scaled power: " + scaledPower);
+            telemetry.log("LidarNavigationSystem", "distance1: " + getDistance1());
+            telemetry.log("LidarNavigationSystem", "distance2: " + getDistance2());
             driveSystem.setPower(direction * scaledPower);
             telemetry.write();
         }
@@ -151,8 +151,8 @@ public class DistanceSystem extends System {
             double rightPower = correctionPowers[1];
 
             driveSystem.tankDrive(leftPower, rightPower);
-            telemetry.log("DistanceSystem", "leftPower: " + leftPower);
-            telemetry.log("DistanceSystem", "rightPower: " +  rightPower);
+            telemetry.log("LidarNavigationSystem", "leftPower: " + leftPower);
+            telemetry.log("LidarNavigationSystem", "rightPower: " +  rightPower);
             telemetry.write();
         }
     }
@@ -176,12 +176,12 @@ public class DistanceSystem extends System {
         while (!isOnCrater()) {
             correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.CRATOR);
 
-            telemetry.log("DistanceSystem","scaled power: " + adjustedPower);
+            telemetry.log("LidarNavigationSystem","scaled power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
             telemetry.write();
         }
         driveSystem.setPower(0);
-        telemetry.log("DistanceSystem","reached crator");
+        telemetry.log("LidarNavigationSystem","reached crator");
         telemetry.write();
     }
 
@@ -197,12 +197,12 @@ public class DistanceSystem extends System {
         while (!isInDepot()) {
             correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.CRATOR);
 
-            telemetry.log("DistanceSystem","scaled power: " + adjustedPower);
+            telemetry.log("LidarNavigationSystem","scaled power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
             telemetry.write();
         }
         driveSystem.setPower(0);
-        telemetry.log("DistanceSystem","reached depot");
+        telemetry.log("LidarNavigationSystem","reached depot");
         telemetry.write();
     }
 
@@ -257,9 +257,5 @@ public class DistanceSystem extends System {
         int blueTriggerValue = 8;
         return ((colorSystem.getRed() < redTriggerValue) ||
                 (colorSystem.getBlue() < blueTriggerValue));
-    }
-
-    private enum StopCondition {
-        DISTANCE, DEPOT, CRATOR;
     }
 }

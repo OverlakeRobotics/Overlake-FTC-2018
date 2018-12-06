@@ -111,9 +111,5 @@ public class IMUSystem extends System {
     String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
-
-    public void reIninitalize() {
-        imu.initialize(parameters);
-    }
 }
 

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
-import org.firstinspires.ftc.teamcode.systems.distance.DistanceSystem;
+import org.firstinspires.ftc.teamcode.systems.lidar.LidarNavigationSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
@@ -20,13 +20,12 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public MecanumDriveSystem driveSystem;
     public IMUSystem imuSystem;
     public ColorSystem colorSystem;
-    public DistanceSystem distanceSystem;
+    public LidarNavigationSystem distanceSystem;
     public Marker markerSystem;
 
     public double initPitch;
     public double initRoll;
 
-    public int zone;
     public int backCubeIn; // the inches to back up after knocking the cube
     public int approachDeg0; //the angle at which the robot approaches the wall after tensor flow
     public int approachDeg1; // reletive to starting position
@@ -49,10 +48,9 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         this.driveSystem = new MecanumDriveSystem(this);
         this.imuSystem = new IMUSystem(this);
         colorSystem = new ColorSystem(this);
-        distanceSystem = new DistanceSystem(this, driveSystem, colorSystem);
-        markerSystem = new Marker(this);
+        distanceSystem = new LidarNavigationSystem(this, driveSystem, colorSystem);
+        //markerSystem = new Marker(this);
 
-        zone = config.getInt("zone");
         backCubeIn = config.getInt("backCubeIn");//10
         approachDeg0 = config.getInt("approachDeg0");//-90
         approachDeg1 = config.getInt("approachDeg1");//-120

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.systems.distance.DistanceSystem;
+import org.firstinspires.ftc.teamcode.systems.lidar.LidarNavigationSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 
 /**
@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 public abstract class AutonomousOpMode extends LinearOpMode {
 
     MecanumDriveSystem driveSystem;
-    DistanceSystem distanceSystem;
+    LidarNavigationSystem distanceSystem;
 
     public AutonomousOpMode() {
     }
