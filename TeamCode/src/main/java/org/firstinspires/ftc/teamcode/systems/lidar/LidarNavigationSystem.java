@@ -130,22 +130,6 @@ public class LidarNavigationSystem extends System {
         while (isOutOfBounds(closeBuffer, farBuffer)) {
             telemetry.log("driveTest", "isOutOfBounds");
 
-            /*boolean reachedStopCondition = false;
-            switch (stopCondition) {
-                case DISTANCE:
-                    reachedStopCondition = (driveSystem.getMinDistanceFromTarget() < 50);
-                    break;
-                case DEPOT:
-                    reachedStopCondition = isInDepot();
-                    break;
-                case CRATOR:
-                    reachedStopCondition = isOnCrater();
-                    break;
-            }
-            if (reachedStopCondition) {
-                break;
-            }*/
-
             double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, correctionPower);
             double leftPower = correctionPowers[0];
             double rightPower = correctionPowers[1];
