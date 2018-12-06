@@ -17,8 +17,8 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
  */
 public class SlideSystem extends System
 {
-    private final double MaxWinchPower = -0.7;
-    private final int EncoderTop = 0;
+    private final double MaxWinchPower = 0.7;
+    private final int EncoderTop = 8730;
 
     private DigitalChannel limitTop;
     private DigitalChannel limitMiddle;
@@ -27,7 +27,7 @@ public class SlideSystem extends System
     private Ramp rampBottom;
     private SlideState state;
 
-    private double winchOrigin;
+    private int winchOrigin;
 
     /**
      * Creates a new linear slide system in the current opmode
@@ -40,17 +40,18 @@ public class SlideSystem extends System
         limitTop = hardwareMap.get(DigitalChannel.class, "limitTop");
         limitMiddle = hardwareMap.get(DigitalChannel.class, "limitMiddle");
 
-        winchOrigin = winch.getCurrentPosition();
         setState(SlideState.IDLE);
         limitTop.setMode(DigitalChannel.Mode.INPUT);
         limitMiddle.setMode(DigitalChannel.Mode.INPUT);
-        rampBottom = new ExponentialRamp(
-            new Point(0,0),
-            new Point((winchOrigin + EncoderTop) / 2, MaxWinchPower)
+
+        winchOrigin = winch.getCurrentPosition();
+        rampBottom = new LogarithmicRamp(
+                new Point(0.001,0.1),
+                new Point((winchOrigin + EncoderTop), MaxWinchPower)
         );
-        rampTop = new ExponentialRamp(
-            new Point((winchOrigin + EncoderTop) / 2, MaxWinchPower),
-            new Point(winchOrigin + EncoderTop, 0)
+        rampTop = new LogarithmicRamp(
+                new Point((winchOrigin + EncoderTop), MaxWinchPower),
+                new Point(0, 0.1)
         );
     }
 
@@ -66,6 +67,11 @@ public class SlideSystem extends System
      * Runs the slide system
      */
     public void run() {
+        telemetry.log("Encoder", winch.getCurrentPosition());
+        telemetry.log("Top Power", rampTop.scaleX(winch.getCurrentPosition()));
+        telemetry.log("Bottom Power", rampBottom.scaleX(winch.getCurrentPosition()));
+        telemetry.log("Origin", winchOrigin);
+        telemetry.write();
         switch (state) {
             case WINCHING_TO_TOP:
                 slideUp();
@@ -87,7 +93,8 @@ public class SlideSystem extends System
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTop())
         {
-            winch.setPower(MaxWinchPower);
+            winch.setPower(rampTop.scaleX(winch.getCurrentPosition()));
+//            winch.setPower(MaxWinchPower);
         }
         else
         {
@@ -111,7 +118,8 @@ public class SlideSystem extends System
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom())
         {
-            winch.setPower(-MaxWinchPower);
+            winch.setPower(-rampBottom.scaleX(winch.getCurrentPosition()));
+//            winch.setPower(-MaxWinchPower);
         }
         else
         {
@@ -124,7 +132,7 @@ public class SlideSystem extends System
      * @return Returns true if the slide is at the bottom
      */
     private boolean isAtBottom() {
-        return winch.getCurrentPosition() >= winchOrigin;
+        return winch.getCurrentPosition() <= winchOrigin;
     }
 
     /**

@@ -29,16 +29,11 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.test;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
@@ -64,23 +59,35 @@ public class TensorFlowSystem extends LinearOpMode {
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
     private static final String TAG = "TensorFlowTelemetry";
 
-    private static final int SCREEN_WIDTH = 1280;
-    private static final int SCREEN_CENTER = 1280 / 2;
-    private static final int OFFSET = 20;
+    private static final int CENTER = 750;
+    private static final int OFFSET = 50;
 
     private TensorFlow tensorFlow;
     private MecanumDriveSystem driveSystem;
     private boolean hasDriven;
+    private boolean hasTurned;
+    private boolean doneSearching;
 
     @Override
     public void runOpMode() {
         initializeOpMode();
+        hasDriven = false;
+        hasTurned = false;
+        doneSearching = false;
         waitForStart();
         if (opModeIsActive()) {
             tensorFlow.activate();
             lookForGoldMineral();
         }
         tensorFlow.shutDown();
+        driveSystem.driveToPositionInches(16, -1);
+        if (doneSearching) {
+            driveSystem.turn(-20, 0.8);
+        } else if (hasTurned) {
+            driveSystem.turn(-60, 0.8);
+        } else {
+            driveSystem.turn(-40, 0.8);
+        }
     }
 
     private void initializeOpMode() {
@@ -93,10 +100,6 @@ public class TensorFlowSystem extends LinearOpMode {
             telemetry.addData("Sorry!", "This device is not compatible with TFOD");
         }
     }
-
-    /**
-     * Initialize the Vuforia localization engine.
-     */
 
     private void lookForGoldMineral() {
         while (shouldLookForGoldMineral()) {
@@ -116,71 +119,48 @@ public class TensorFlowSystem extends LinearOpMode {
     }
 
     private void handleUpdatedRecognitions(List<Recognition> updatedRecognitions) {
+        int goldMineralX = getGoldMineralX(updatedRecognitions);
+        if (!hasFoundGoldMineral(goldMineralX)) {
+            turnAndSearch();
+        } else if (hasFoundGoldMineral(goldMineralX)) {
+            handleGoldMineralWhenFound();
+        }
+    }
+
+    private int getGoldMineralX(List<Recognition> recognitions) {
+        double lowestBottom = Double.MAX_VALUE;
         int goldMineralX = -1;
-        int silverMineral1X = -1;
-        int silverMineral2X = -1;
-
-        telemetry.addData("# Object Detected", updatedRecognitions.size());
-
-        for (Recognition recognition : updatedRecognitions) {
-            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+        boolean silverMineralFound = false;
+        for (Recognition recognition : recognitions) {
+            if (recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
+                silverMineralFound = true;
+            }
+            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getBottom() < lowestBottom) {
+                lowestBottom = recognition.getBottom();
                 goldMineralX = (int) recognition.getBottom();
-            } else if (silverMineral1X == -1) {
-                silverMineral1X = (int) recognition.getBottom();
-            } else {
-                silverMineral2X = (int) recognition.getBottom();
             }
         }
-
-        if (hasFoundGoldMineral(goldMineralX)) {
-            handleSilverMineralWhenFound(silverMineral1X, silverMineral2X);
+        if (silverMineralFound) {
+            return -1;
         } else {
-            handleGoldMineralWhenFound(goldMineralX);
-        }
-        telemetry.update();
-    }
-
-    private void handleSilverMineralWhenFound(int silverMineral1X, int silverMineral2X) {
-        // make silver1 on left and silver2 on right
-        if (silverMineral1X > silverMineral2X) {
-            int temp = silverMineral1X;
-            silverMineral1X = silverMineral2X;
-            silverMineral2X = temp;
-        }
-
-        // find the gold block
-        if (shouldStrafeRight(silverMineral2X)) {
-            Log.i(TAG, "can't find gold -- strafing right");
-        } else {
-            Log.i(TAG, "can't find gold -- strafing left");
+            return goldMineralX;
         }
     }
 
-    private boolean shouldStrafeRight(int silverMineral2X) {
-        return silverMineral2X < SCREEN_WIDTH * 2 / 3;
-    }
-
-    private void handleGoldMineralWhenFound(int goldMineralX) {
-        if (goldMineralX < SCREEN_CENTER - OFFSET) {
-            // strafe right to center gold
-            Log.i(TAG, "strafing right to center gold");
-            drive(0, -0.2, 75);
-        } else if (goldMineralX > SCREEN_CENTER + OFFSET) {
-            // strafe left to center gold
-            Log.i(TAG, "strafing left to center gold");
-            drive(0, 0.2, 75);
-        } else {
-            Log.i(TAG, "driving forward to hit gold -- gold seen");
-            driveSystem.turn(-90, 0.5);
-            drive(0, 0.5, 1500);
-            hasDriven = true;
+    private void turnAndSearch() {
+        if (!hasTurned) {
+            hasTurned = true;
+            driveSystem.turn(25, 0.8);
+        } else if (!doneSearching) {
+            driveSystem.turn(-50, 0.8);
+            doneSearching = true;
         }
     }
 
-    private void drive(double x, double y, int miliseconds) {
-        driveSystem.mecanumDriveXY(x, y);
-        sleep(miliseconds);
-        driveSystem.mecanumDriveXY(0, 0);
+    private void handleGoldMineralWhenFound() {
+        driveSystem.turn(-90, 1);
+        driveSystem.driveToPositionInches(38, 0.8);
+        hasDriven = true;
     }
 
     private boolean hasFoundGoldMineral(int goldMineralX) {

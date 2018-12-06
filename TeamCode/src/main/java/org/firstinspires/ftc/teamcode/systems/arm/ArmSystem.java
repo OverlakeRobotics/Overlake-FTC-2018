@@ -23,14 +23,15 @@ public class ArmSystem extends System {
     private AnalogInput potentiometer;
     private Ramp rampUp;
     private Ramp rampDown;
+    private Ramp fallingRamp;
 
-    private final double PotentiometerMaximum = 2.3;
-    private final double PotentiometerMinimum = 0.8;
+    private final double MaximumVoltage = 2.3;
+    private final double MinimumVoltage = 0.75;
+    private final double LatchVoltage = 1.3;
     private final double MaxPower = 0.3;
-    private final double MinPower = 0.01;
+    private final double MinPower = 0.1;
 
     private ArmState currentState;
-    private double latchVoltage;
 
     /**
      * Builds a new Arm System for the given opmode
@@ -44,12 +45,12 @@ public class ArmSystem extends System {
         potentiometer = hardwareMap.get(AnalogInput.class, "potentiometer");
         setState(ArmState.IDLE);
         rampUp = new LogarithmicRamp(
-                new Point(PotentiometerMaximum / 2, MaxPower),
-                new Point(PotentiometerMaximum, MinPower)
+            new Point(MaximumVoltage / 2, MaxPower),
+            new Point(MaximumVoltage, MinPower)
         );
         rampDown = new LogarithmicRamp(
-                new Point(PotentiometerMinimum, MinPower),
-                new Point(PotentiometerMaximum / 2, MaxPower)
+            new Point(MinimumVoltage, MinPower),
+            new Point(MaximumVoltage / 2, MaxPower)
         );
     }
 
@@ -65,8 +66,6 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
-        telemetry.log("voltage", potentiometer.getVoltage());
-        telemetry.write();
         switch (currentState) {
             case RELEASE_PIN:
                 releaseArmPin();
@@ -93,8 +92,7 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom()) {
-            motor1.setPower(rampDown.scaleX(potentiometer.getVoltage()));
-            motor2.setPower(-rampDown.scaleX(potentiometer.getVoltage()));
+            runMotors(ArmDirection.DOWN, rampDown.scaleX(potentiometer.getVoltage()));
         } else {
             stop();
         }
@@ -104,8 +102,22 @@ public class ArmSystem extends System {
      * Checks if the arm is at the bottom
      * @return Returns true if the arm is at the bottom
      */
-    private boolean isAtBottom() {
-        return potentiometer.getVoltage() <= PotentiometerMinimum;
+    public boolean isAtBottom() {
+        return potentiometer.getVoltage() <= MinimumVoltage;
+    }
+
+    /**
+     * Runs the motors in a given direction
+     * @param direction The direction to run the motors
+     */
+    private void runMotors(ArmDirection direction, double power) {
+        if (direction == ArmDirection.DOWN) {
+            motor1.setPower(power);
+            motor2.setPower(-power);
+        } else {
+            motor1.setPower(-power);
+            motor2.setPower(power);
+        }
     }
 
     /**
@@ -115,8 +127,7 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTopPosition()) {
-            motor1.setPower(-rampUp.scaleX(potentiometer.getVoltage()));
-            motor2.setPower(rampUp.scaleX(potentiometer.getVoltage()));
+            runMotors(ArmDirection.UP, rampUp.scaleX(potentiometer.getVoltage()));
         } else {
             stop();
         }
@@ -126,14 +137,14 @@ public class ArmSystem extends System {
      * Checks that the arm is at the top
      * @return Returns true if the arm is at the top
      */
-    private boolean isAtTopPosition() {
-        return potentiometer.getVoltage() >= PotentiometerMaximum;
+    public boolean isAtTopPosition() {
+        return potentiometer.getVoltage() >= MaximumVoltage;
     }
 
     /**
      * Stops the arm from running
      */
-    private void stop() {
+    public void stop() {
         setState(ArmState.IDLE);
         motor1.setPower(0);
         motor2.setPower(0);
@@ -143,9 +154,12 @@ public class ArmSystem extends System {
      * Releases the pin of that holds the arm up when latching
      */
     public void releaseArmPin() {
-        latchVoltage = potentiometer.getVoltage();
+        fallingRamp = new LogarithmicRamp(
+                new Point(0.0001, 0.1),
+                new Point(potentiometer.getVoltage(), MaxPower)
+        );
         armRelease.setPosition(0);
-        setState(ArmState.IDLE);
+        setState(ArmState.FALLING);
     }
 
     /**
@@ -157,19 +171,41 @@ public class ArmSystem extends System {
     }
 
     /**
-     *
+     * Slow the descent of the robot after de-latching
      */
     public void slowFall() {
-        //Ramp ramp = new LogarithmicRamp(new Point(0.0001, 0), new Point(latchVoltage, MaxPower));
-        if (!hasHitFloor()) {
-            motor1.setPower(0.2);
-            motor2.setPower(-0.2);
+        if (!isOnFloor()) {
+            runMotors(ArmDirection.DOWN, fallingRamp.scaleX(potentiometer.getVoltage()));
         } else {
-            setState(ArmState.RELEASE_PIN);
+            stop();
         }
     }
 
-    private boolean hasHitFloor() {
-        return potentiometer.getVoltage() >= 1.8 && potentiometer.getVoltage() <= 2.0;
+    /**
+     * checks if the
+     * @return Returns true if the robot has hit the ground
+     */
+    public boolean isOnFloor() {
+        return potentiometer.getVoltage() >= 1.65 && potentiometer.getVoltage() <= 1.7;
+    }
+
+    /**
+     * Runs the arm to the latch position
+     */
+    public void latch() {
+        if (!isAtLatchPosition()) {
+            runMotors(ArmDirection.DOWN, MaxPower);
+        } else {
+            setArmPin();
+            stop();
+        }
+    }
+
+    /**
+     * Checks if the arm is at the latch position
+     * @return Checks if the arm is at latch position
+     */
+    public boolean isAtLatchPosition() {
+        return potentiometer.getVoltage() <= LatchVoltage;
     }
 }

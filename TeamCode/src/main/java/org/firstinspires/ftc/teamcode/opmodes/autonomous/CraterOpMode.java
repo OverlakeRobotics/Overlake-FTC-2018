@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 import java.util.List;
 
 
-@Autonomous(name = "Competition Autonomous")
+@Autonomous(name = "Crater Side Autonomous")
 public class CraterOpMode extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
