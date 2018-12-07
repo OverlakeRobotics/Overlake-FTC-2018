@@ -39,7 +39,6 @@ public class CraterOpMode extends LinearOpMode {
         hasCheckedLeft = false;
         initializeOpMode();
         waitForStart();
-
         if (opModeIsActive()) {
             tensorFlow.activate();
             lookForGoldMineral();

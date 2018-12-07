@@ -75,19 +75,17 @@ public class TensorFlowSystem extends LinearOpMode {
         hasTurned = false;
         doneSearching = false;
         waitForStart();
-        if (opModeIsActive()) {
-            tensorFlow.activate();
-            lookForGoldMineral();
+        tensorFlow.activate();
+        lookForGoldMineral();
+        driveSystem.driveToPositionInches(18, -0.5);
+        if (doneSearching) {
+            driveSystem.turn(117, 0.8);
+        } else if (hasTurned) {
+            driveSystem.turn(67, 0.8);
+        } else {
+            driveSystem.turn(92, 0.8);
         }
         tensorFlow.shutDown();
-        driveSystem.driveToPositionInches(16, -1);
-        if (doneSearching) {
-            driveSystem.turn(-20, 0.8);
-        } else if (hasTurned) {
-            driveSystem.turn(-60, 0.8);
-        } else {
-            driveSystem.turn(-40, 0.8);
-        }
     }
 
     private void initializeOpMode() {
@@ -128,23 +126,13 @@ public class TensorFlowSystem extends LinearOpMode {
     }
 
     private int getGoldMineralX(List<Recognition> recognitions) {
-        double lowestBottom = Double.MAX_VALUE;
         int goldMineralX = -1;
-        boolean silverMineralFound = false;
         for (Recognition recognition : recognitions) {
-            if (recognition.getLabel().equals(LABEL_SILVER_MINERAL)) {
-                silverMineralFound = true;
-            }
-            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getBottom() < lowestBottom) {
-                lowestBottom = recognition.getBottom();
+            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                 goldMineralX = (int) recognition.getBottom();
             }
         }
-        if (silverMineralFound) {
-            return -1;
-        } else {
-            return goldMineralX;
-        }
+        return goldMineralX;
     }
 
     private void turnAndSearch() {
@@ -159,7 +147,7 @@ public class TensorFlowSystem extends LinearOpMode {
 
     private void handleGoldMineralWhenFound() {
         driveSystem.turn(-90, 1);
-        driveSystem.driveToPositionInches(38, 0.8);
+        driveSystem.driveToPositionInches(36, 0.8);
         hasDriven = true;
     }
 

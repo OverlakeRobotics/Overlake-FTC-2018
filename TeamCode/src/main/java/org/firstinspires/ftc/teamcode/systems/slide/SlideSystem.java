@@ -51,7 +51,7 @@ public class SlideSystem extends System
         );
         rampTop = new LogarithmicRamp(
                 new Point((winchOrigin + EncoderTop), MaxWinchPower),
-                new Point(0, 0.1)
+                new Point(0.0001, 0.1)
         );
     }
 
