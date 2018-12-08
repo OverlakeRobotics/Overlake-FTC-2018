@@ -32,7 +32,7 @@ public class Marker extends System {
      * Resets the position of the arm marker
      */
     public void reset() {
-        servo.setPosition(90.0);
+        servo.setPosition(1);
     }
 
 }

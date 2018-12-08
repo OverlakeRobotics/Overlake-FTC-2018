@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
-
 @Autonomous(name = "CraterStartOpMode", group = "Bot")
 public class CraterStartOpMode extends BaseAutonomousOpMode {
     private final String TAG = "CraterStartOpMode";
@@ -24,17 +22,18 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         ////
 
         // tensor flow
-        driveSystem.driveToPositionInches(backCubeIn, 1, false);
-        driveSystem.turnAbsolute(approachDeg0, 1);
-        distanceSystem.getCloseToWall(targDist1, 0.5);
-        //driveSystem.turnAbsolute(approachDeg1, 1);
+        int blockPos = determineBlockPos();
+        driveSystem.driveToPositionInches(backCubeIn, -autonoPower, false);
+        driveSystem.turnAbsolute(cratApproachDeg0, autonoPower);
+        distanceSystem.getCloseToWall(cratTargDist1, toWallPow);
+        //driveSystem.turnAbsolute(cratApproachDeg1, 1);
         //distanceSystem.getCloseToWall(7, 0.8);
-        driveSystem.turnAbsolute(approachDeg2, 1);
-        parkInDepot(-1, colorSystem);
-        //markerSystem.place();
-        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.BACKWARD);
-        distanceSystem.driveAlongWallInches(40, 3, 6, 1, true);
-        parkOnCrator(1, initPitch, initRoll);
+        driveSystem.turnAbsolute(cratApproachDeg1, autonoPower);
+        parkInDepot(-autonoPower, colorSystem);
+        markerSystem.reset();
+        sleep(300);
+        parkOnCrator(autonoPower, initPitch, initRoll);
+        markerSystem.reset();
 
 
         stop();

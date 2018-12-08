@@ -28,7 +28,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public int TICKS_IN_INCH;
     public int TICKS_IN_INCH_STRAFE;
     private final IScale JOYSTICK_SCALE = new LinearScale(0.62, 0);
-    private double TURN_RAMP_POWER_CUTOFF;
+    public double TURN_RAMP_POWER_CUTOFF;
     public double RAMP_POWER_CUTOFF;
     public int RAMP_DISTANCE_TICKS;
 
@@ -346,7 +346,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
      * @param heading the heading
      * @return
      */
-    private double getTurnPower(Ramp ramp, double targetHeading, double heading) {
+    public double getTurnPower(Ramp ramp, double targetHeading, double heading) {
         double diff = computeDegreesDiff(targetHeading, heading);
 
         if (diff < 0) {
