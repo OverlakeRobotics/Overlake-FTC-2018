@@ -46,12 +46,12 @@ public class SlideSystem extends System
 
         winchOrigin = winch.getCurrentPosition();
         rampBottom = new LogarithmicRamp(
-                new Point(0.001,0.1),
+                new Point(0.001,0),
                 new Point((winchOrigin + EncoderTop), MaxWinchPower)
         );
         rampTop = new LogarithmicRamp(
                 new Point((winchOrigin + EncoderTop), MaxWinchPower),
-                new Point(0.0001, 0.1)
+                new Point(0.0001, 0)
         );
     }
 
@@ -132,7 +132,7 @@ public class SlideSystem extends System
      * @return Returns true if the slide is at the bottom
      */
     private boolean isAtBottom() {
-        return winch.getCurrentPosition() <= winchOrigin;
+        return winch.getCurrentPosition() < winchOrigin;
     }
 
     /**

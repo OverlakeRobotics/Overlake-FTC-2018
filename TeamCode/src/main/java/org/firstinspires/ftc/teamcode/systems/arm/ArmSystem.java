@@ -28,8 +28,10 @@ public class ArmSystem extends System {
     private final double MaximumVoltage = 2.3;
     private final double MinimumVoltage = 0.75;
     private final double LatchVoltage = 1.3;
-    private final double MaxPower = 0.3;
-    private final double MinPower = 0.1;
+    private final double MaxPower = 0.5;
+    private final double LatchPower = 0.7;
+    private final double MinPower = 0.15;
+    private boolean isRamping;
 
     private ArmState currentState;
 
@@ -43,6 +45,7 @@ public class ArmSystem extends System {
         motor2 = hardwareMap.dcMotor.get("parallelM2");
         armRelease = hardwareMap.servo.get("armRelease");
         potentiometer = hardwareMap.get(AnalogInput.class, "potentiometer");
+        isRamping = true;
         setState(ArmState.IDLE);
         rampUp = new LogarithmicRamp(
             new Point(MaximumVoltage / 2, MaxPower),
@@ -66,6 +69,7 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
+        telemetry.log("Arm Power", isRamping);
         switch (currentState) {
             case RELEASE_PIN:
                 releaseArmPin();
@@ -92,7 +96,7 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom()) {
-            runMotors(ArmDirection.DOWN, rampDown.scaleX(potentiometer.getVoltage()));
+            runMotors(ArmDirection.DOWN);
         } else {
             stop();
         }
@@ -110,11 +114,13 @@ public class ArmSystem extends System {
      * Runs the motors in a given direction
      * @param direction The direction to run the motors
      */
-    private void runMotors(ArmDirection direction, double power) {
+    private void runMotors(ArmDirection direction) {
         if (direction == ArmDirection.DOWN) {
+            double power = getPower(rampDown);
             motor1.setPower(power);
             motor2.setPower(-power);
         } else {
+            double power = getPower(rampUp);
             motor1.setPower(-power);
             motor2.setPower(power);
         }
@@ -127,7 +133,7 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTopPosition()) {
-            runMotors(ArmDirection.UP, rampUp.scaleX(potentiometer.getVoltage()));
+            runMotors(ArmDirection.UP);
         } else {
             stop();
         }
@@ -151,6 +157,24 @@ public class ArmSystem extends System {
     }
 
     /**
+     * toggles the ramping of the robot
+     */
+    public void toggleRamping() {
+        isRamping = !isRamping;
+    }
+
+    /**
+     * sets the power of the robot
+     */
+    private double getPower(Ramp ramp) {
+        if (isRamping) {
+            return ramp.scaleX(potentiometer.getVoltage());
+        } else {
+            return LatchPower;
+        }
+    }
+
+    /**
      * Releases the pin of that holds the arm up when latching
      */
     public void releaseArmPin() {
@@ -159,7 +183,7 @@ public class ArmSystem extends System {
                 new Point(potentiometer.getVoltage(), MaxPower)
         );
         armRelease.setPosition(0);
-        setState(ArmState.FALLING);
+        setState(ArmState.IDLE);
     }
 
     /**
@@ -175,7 +199,7 @@ public class ArmSystem extends System {
      */
     public void slowFall() {
         if (!isOnFloor()) {
-            runMotors(ArmDirection.DOWN, fallingRamp.scaleX(potentiometer.getVoltage()));
+            runMotors(ArmDirection.DOWN);
         } else {
             stop();
         }
@@ -186,15 +210,16 @@ public class ArmSystem extends System {
      * @return Returns true if the robot has hit the ground
      */
     public boolean isOnFloor() {
-        return potentiometer.getVoltage() >= 1.65 && potentiometer.getVoltage() <= 1.7;
+        return potentiometer.getVoltage() >= 1.3 && potentiometer.getVoltage() <= 1.4;
     }
 
     /**
      * Runs the arm to the latch position
      */
     public void latch() {
+        isRamping = false;
         if (!isAtLatchPosition()) {
-            runMotors(ArmDirection.DOWN, MaxPower);
+            runMotors(ArmDirection.DOWN);
         } else {
             setArmPin();
             stop();

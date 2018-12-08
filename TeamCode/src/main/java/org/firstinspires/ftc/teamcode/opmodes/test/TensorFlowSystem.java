@@ -75,15 +75,19 @@ public class TensorFlowSystem extends LinearOpMode {
         hasTurned = false;
         doneSearching = false;
         waitForStart();
+        driveSystem.mecanumDriveXY(-0.3, 0);
+        sleep(700);
+        driveSystem.mecanumDriveXY(0,0);
+        driveSystem.driveToPositionInches(6, 0.7);
         tensorFlow.activate();
         lookForGoldMineral();
-        driveSystem.driveToPositionInches(18, -0.5);
+        driveSystem.driveToPositionInches(18, -1);
         if (doneSearching) {
-            driveSystem.turn(117, 0.8);
+            driveSystem.turn(125, 1);
         } else if (hasTurned) {
-            driveSystem.turn(67, 0.8);
+            driveSystem.turn(60, 1);
         } else {
-            driveSystem.turn(92, 0.8);
+            driveSystem.turn(95, 1);
         }
         tensorFlow.shutDown();
     }
@@ -138,16 +142,16 @@ public class TensorFlowSystem extends LinearOpMode {
     private void turnAndSearch() {
         if (!hasTurned) {
             hasTurned = true;
-            driveSystem.turn(25, 0.8);
+            driveSystem.turn(35, 1);
         } else if (!doneSearching) {
-            driveSystem.turn(-50, 0.8);
+            driveSystem.turn(-75, 1);
             doneSearching = true;
         }
     }
 
     private void handleGoldMineralWhenFound() {
         driveSystem.turn(-90, 1);
-        driveSystem.driveToPositionInches(36, 0.8);
+        driveSystem.driveToPositionInches(32, 1);
         hasDriven = true;
     }
 

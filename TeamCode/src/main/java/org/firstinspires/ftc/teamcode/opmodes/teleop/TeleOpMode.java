@@ -138,6 +138,13 @@ public class TeleOpMode extends TeleOpModeDebugger {
                 armSystem.setArmPin();
             }
         };
+        controller1.aShifted.pressedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception
+            {
+                armSystem.toggleRamping();
+            }
+        };
     }
 
     private void addFlailButton() {
