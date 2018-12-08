@@ -28,7 +28,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     public int TICKS_IN_INCH;
     public int TICKS_IN_INCH_STRAFE;
     private final IScale JOYSTICK_SCALE = new LinearScale(0.62, 0);
-    private double TURN_RAMP_POWER_CUTOFF;
+    public double TURN_RAMP_POWER_CUTOFF;
     public double RAMP_POWER_CUTOFF;
     public int RAMP_DISTANCE_TICKS;
 
@@ -186,8 +186,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     }
 
     public void driveToPositionInches(int inches, double power, boolean shouldRamp) {
-        DriveDirection driveDirection = (power <= 0 || inches <= 0) ? DriveDirection.FORWARD:
-                DriveDirection.BACKWARD;
+        DriveDirection driveDirection = (power <= 0 || inches <= 0) ? DriveDirection.BACKWARD:
+                DriveDirection.FORWARD;
         setDirection(driveDirection);
         int ticks = (int) inchesToTicks(inches);
         driveToPositionTicks(ticks, power, shouldRamp);
@@ -226,7 +226,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         Ramp ramp = new ExponentialRamp(new Point(0, RAMP_POWER_CUTOFF),
-                new Point(RAMP_DISTANCE_TICKS, power));
+                new Point(RAMP_DISTANCE_TICKS, Math.abs(power)));
 
         double adjustedPower = Range.clip(power, -1.0, 1.0);
         setPower(adjustedPower);
@@ -348,7 +348,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
      * @param heading the heading
      * @return
      */
-    private double getTurnPower(Ramp ramp, double targetHeading, double heading) {
+    public double getTurnPower(Ramp ramp, double targetHeading, double heading) {
         double diff = computeDegreesDiff(targetHeading, heading);
 
         if (diff < 0) {

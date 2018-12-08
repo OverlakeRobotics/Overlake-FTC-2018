@@ -195,6 +195,9 @@ public class LidarNavigationSystem extends System {
 
         while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
             driveSystem.setPower(power);
+            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
+            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
+            telemetry.write();
         }
         driveSystem.setPower(0);
     }
@@ -241,5 +244,29 @@ public class LidarNavigationSystem extends System {
         int blueTriggerValue = 8;
         return ((colorSystem.getRed() < redTriggerValue) ||
                 (colorSystem.getBlue() < blueTriggerValue));
+    }
+
+    public void alignWithWall(double maxPower) {
+        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+
+        double targetHeading = 0;
+
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Between 90 (changed from 130) and 2 degrees away from the target
+        // we want to slow down from maxPower to 0.1
+        ExponentialRamp ramp = new ExponentialRamp(new Point(2.0, driveSystem.TURN_RAMP_POWER_CUTOFF), new Point(90, maxPower));
+
+        while (Math.abs(getDistance1() - getDistance2()) > 0.05) {
+            double power = driveSystem.getTurnPower(ramp, getDistance2(), getDistance1());
+            telemetry.log("MecanumDriveSystem","heading: " + (getDistance2() - getDistance1()));
+            telemetry.log("MecanumDriveSystem","target heading: " + targetHeading);
+            telemetry.log("MecanumDriveSystem","power: " + power);
+            telemetry.write();
+
+
+            driveSystem.tankDrive(power, -power);
+        }
+        driveSystem.setPower(0);
     }
 }

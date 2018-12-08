@@ -26,13 +26,16 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public double initPitch;
     public double initRoll;
 
+    public int zone;
     public int backCubeIn; // the inches to back up after knocking the cube
-    public int approachDeg0; //the angle at which the robot approaches the wall after tensor flow
-    public int approachDeg1; // reletive to starting position
+    public int cratApproachDeg0; //the angle at which the robot approaches the wall after tensor flow
+    public int cratApproachDeg1; // reletive to starting position
     public int approachDeg2;
-    public double targDist1;
+    public double cratTargDist1;
+    public double toWallPow;
+    public double autonoPower;
 
-    public double CRITICAL_ANGLE;
+    public double CRITICAL_ANGLE = 1.5;
     int RED_TRGGER_VALUE = 12;
     int BLUE_TRIGGER_VALUE = 8;
 
@@ -49,13 +52,18 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         this.imuSystem = new IMUSystem(this);
         colorSystem = new ColorSystem(this);
         distanceSystem = new LidarNavigationSystem(this, driveSystem, colorSystem);
-        //markerSystem = new Marker(this);
+        markerSystem = new Marker(this);
 
+        zone = config.getInt("zone");
         backCubeIn = config.getInt("backCubeIn");//10
-        approachDeg0 = config.getInt("approachDeg0");//-90
-        approachDeg1 = config.getInt("approachDeg1");//-120
-        config.getInt("approachDeg2");//-135
-        config.getDouble("targDist1");
+
+        cratApproachDeg0 = config.getInt("cratApproachDeg0");//-90
+        cratApproachDeg1 = config.getInt("cratApproachDeg1");//-120
+        cratTargDist1 = config.getDouble("cratTargDist1");
+
+
+        toWallPow = config.getDouble("ToWallPow");
+        autonoPower = config.getDouble("autonopower");
 
         initPitch = imuSystem.getPitch();
         initRoll = imuSystem.getRoll();
@@ -87,5 +95,21 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         telemetry.addLine(message);
         telemetry.update();
         sleep((int)(1000 * sec));
+    }
+
+    public int determineBlockPos() {
+        int pos = 0;
+        telemetry.addLine("detBlockPos d1: " + distanceSystem.getDistance1());
+        telemetry.update();
+        if ((distanceSystem.getDistance1() > 24) && (distanceSystem.getDistance1() < 41)) {
+            pos = 0;
+        } else if (distanceSystem.getDistance1() > 41) {
+            pos = 1;
+        } else if (distanceSystem.getDistance1() < 24) {
+            pos = 2;
+        }
+        telemetry.addLine("block pos: " + pos);
+        telemetry.update();
+        return  pos;
     }
 }
