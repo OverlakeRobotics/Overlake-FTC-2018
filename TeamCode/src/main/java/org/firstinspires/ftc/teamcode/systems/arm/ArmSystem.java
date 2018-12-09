@@ -114,7 +114,7 @@ public class ArmSystem extends System {
      * Runs the motors in a given direction
      * @param direction The direction to run the motors
      */
-    private void runMotors(ArmDirection direction) {
+    public void runMotors(ArmDirection direction) {
         if (direction == ArmDirection.DOWN) {
             double power = getPower(rampDown);
             motor1.setPower(power);

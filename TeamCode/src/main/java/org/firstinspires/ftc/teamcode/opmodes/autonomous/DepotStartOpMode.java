@@ -25,8 +25,7 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
 
         ////
         waitForStart();
-        ////
-        // tensor flow
+        sample();
         driveSystem.driveToPositionInches(backCubeIn, -1, false);
         driveSystem.turnAbsolute(cratApproachDeg0, 1);
         distanceSystem.getCloseToWall(cratTargDist1, 1);
