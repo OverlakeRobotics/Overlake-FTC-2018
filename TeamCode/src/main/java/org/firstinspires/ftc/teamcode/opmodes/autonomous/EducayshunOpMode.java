@@ -6,18 +6,21 @@ import android.media.SoundPool;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
 import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
+import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 
 @Autonomous(name = "EducayshunOpMode", group = "Bot")
     public class EducayshunOpMode extends BaseAutonomousOpMode {
         private final String TAG = "EducationOpMode";
 
-
-    public SoundPool mySound;
-    public int beepID;
+        private ConfigParser testConfigParser;
 
         public EducayshunOpMode() {
             super("EducayshunOpMode");
+
+            testConfigParser = new ConfigParser("Education.omc");
+
         }
 
         @Override
@@ -37,11 +40,10 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
             /////distanceSystem.getCloseToWall(18, 0.4);
 
 
-            
+
         if (zone == 0) {
             for (int i = 0; i < 50000; i++) {
                 distanceSystem.telemetry();
-                colorSystem.telemetry();
                 sleep(10);
             }
         } else if (zone == 1) {
@@ -58,7 +60,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
         } else if (zone == 5) {
             craterSide();
         } else if (zone == 6) {
-            distanceSystem.strafeTowardWall(1, cratApproachDeg1, 1);
+            distanceSystem.strafeTowardWall(inFromWall, cratApproachDeg1, autonoPower);
         } else if (zone == 7) {
             distanceSystem.alignWithWall(1);
         } else if (zone == 8) {
@@ -66,6 +68,22 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
                 colorSystem.telemetry();
                 sleep(10);
             }
+        } else if (zone == 9) {
+            int blockPos = determineBlockPos(); // the targDist is 2 more than the zone num
+            if (blockPos == 1) {
+                driveSystem.strafeToPositionInches(cratTargDist3,
+                        MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT, autonoPower, false);
+            } else if (blockPos == 2) {
+                driveSystem.strafeToPositionInches(cratTargDist4,
+                        MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT, autonoPower, false);
+            } else {
+                driveSystem.strafeToPositionInches(cratTargDist2,
+                        MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT, autonoPower, false);
+            }
+        } else if (zone == 10) {
+            driveSystem.turnAbsolute(135, autonoPower);
+        } else if (zone == 11) {
+            driveSystem.turn(135, autonoPower);
         }
 
 

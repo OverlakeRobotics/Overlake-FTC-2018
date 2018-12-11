@@ -26,14 +26,23 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public double initPitch;
     public double initRoll;
 
-    public int zone;
     public int backCubeIn; // the inches to back up after knocking the cube
     public int cratApproachDeg0; //the angle at which the robot approaches the wall after tensor flow
     public int cratApproachDeg1; // reletive to starting position
     public int approachDeg2;
     public double cratTargDist1;
+    public int cratTargDist2;
+    public int cratTargDist3;
+    public int cratTargDist4;
+
+    public int depDepappraochIn; // depot(OpMode) depot approach inches
+    public double depWallHeading;
+    public int depToCratIn;
+
     public double toWallPow;
     public double autonoPower;
+    public int inFromWall;
+    public int zone;
 
     public double CRITICAL_ANGLE = 1.5;
     int RED_TRGGER_VALUE = 12;
@@ -54,16 +63,23 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         distanceSystem = new LidarNavigationSystem(this, driveSystem, colorSystem);
         markerSystem = new Marker(this);
 
-        zone = config.getInt("zone");
         backCubeIn = config.getInt("backCubeIn");//10
 
         cratApproachDeg0 = config.getInt("cratApproachDeg0");//-90
         cratApproachDeg1 = config.getInt("cratApproachDeg1");//-120
         cratTargDist1 = config.getDouble("cratTargDist1");
+        cratTargDist2 = config.getInt("cratTargDist2");
+        cratTargDist3 = config.getInt("cratTargDist3");
+        cratTargDist4 = config.getInt("cratTargDist4");
 
+        depDepappraochIn = config.getInt("depDepApproachIn");
+        depWallHeading = config.getDouble("depWallHeading");
+        depToCratIn = config.getInt("depToCratIn");
 
         toWallPow = config.getDouble("ToWallPow");
         autonoPower = config.getDouble("autonopower");
+        inFromWall = config.getInt("inFromWall");
+        zone = config.getInt("zone");
 
         initPitch = imuSystem.getPitch();
         initRoll = imuSystem.getRoll();
@@ -99,14 +115,12 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
 
     public int determineBlockPos() {
         int pos = 0;
-        telemetry.addLine("detBlockPos d1: " + distanceSystem.getDistance1());
-        telemetry.update();
-        if ((distanceSystem.getDistance1() > 24) && (distanceSystem.getDistance1() < 41)) {
+        if ((imuSystem.getHeading() - driveSystem.initialHeading) >= 10) {
             pos = 0;
-        } else if (distanceSystem.getDistance1() > 41) {
-            pos = 1;
-        } else if (distanceSystem.getDistance1() < 24) {
+        } else if ((imuSystem.getHeading() - driveSystem.initialHeading) <= 10) {
             pos = 2;
+        } else {
+            pos = 1;
         }
         telemetry.addLine("block pos: " + pos);
         telemetry.update();

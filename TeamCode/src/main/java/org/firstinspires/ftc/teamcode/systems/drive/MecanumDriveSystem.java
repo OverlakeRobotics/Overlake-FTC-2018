@@ -34,7 +34,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     public IMUSystem imuSystem;
 
-    private double initialHeading;
+    public double initialHeading;
     private double initPitch;
     private double initRoll;
 
@@ -194,25 +194,21 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     }
 
     /**
-     * Strafes left for the given amount of inches
+     * Strafes for the given amount of inches
      * @param inches Amount of inches to strafe
+     * @param driveDirection Which direction to strafe
      * @param power Power of the motors
      */
-    public void strafeLeftToPositionInches(int inches, double power) {
-        setDirection(MecanumDriveDirection.STRAFE_LEFT);
+    public void strafeToPositionInches(int inches, MecanumDriveDirection driveDirection,
+                                       double power, boolean shouldRamp) {
+        setDirection(driveDirection);
         int ticks = (int) inchesToTicksStrafe(inches);
-        driveToPositionTicks(ticks, power, true);
+        driveToPositionTicks(ticks, power, shouldRamp);
     }
 
-    /**
-     * Strafes right for the given amount of inches
-     * @param inches Amount of inches to strafe
-     * @param power Power of the motors
-     */
-    public void strafeRightToPositionInches(int inches, double power) {
-        setDirection(MecanumDriveDirection.STRAFE_RIGHT);
-        int ticks = (int) inchesToTicksStrafe(inches);
-        driveToPositionTicks(ticks, power, true);
+    public void strafeToPositionInches(int inches, MecanumDriveDirection driveDirection,
+                                       double power) {
+        strafeToPositionInches(inches, driveDirection, power, true);
     }
 
     private void driveToPositionTicks(int ticks, double power, boolean shouldRamp) {

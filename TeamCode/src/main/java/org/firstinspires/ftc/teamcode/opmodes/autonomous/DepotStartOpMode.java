@@ -8,12 +8,12 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 public class DepotStartOpMode extends BaseAutonomousOpMode {
     private final String TAG = "DepotStartOpMode";
 
-    public int cubePos;
 
     public DepotStartOpMode() {
         super("DepotStartOpMode");
 
-        cubePos = config.getInt("cubePos");
+
+
     }
 
     @Override
@@ -27,15 +27,17 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
         waitForStart();
         ////
         // tensor flow
-        driveSystem.driveToPositionInches(backCubeIn, -1, false);
-        driveSystem.turnAbsolute(cratApproachDeg0, 1);
-        distanceSystem.getCloseToWall(cratTargDist1, 1);
-        driveSystem.turnAbsolute(approachDeg2, 1);
-        parkInDepot(1, colorSystem);
-        markerSystem.place();
-        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.BACKWARD);
-        distanceSystem.driveAlongWallInches(40, 3, 6, 1, true);
-        parkOnCrator(1, initPitch, initRoll);
+        if (determineBlockPos() == 0) {
+            driveSystem.turn(20, autonoPower);
+        } else if (determineBlockPos() == 2) {
+            driveSystem.turn(-20, autonoPower);
+        }
+        parkInDepot(autonoPower, colorSystem);
+        markerSystem.reset();
+        sleep(400);
+        distanceSystem.strafeTowardWall(depDepappraochIn, depWallHeading, autonoPower);
+        distanceSystem.driveAlongWallInches(depToCratIn, 1, 3, autonoPower, true);
+        parkOnCrator(autonoPower, CRITICAL_ANGLE, CRITICAL_ANGLE);
 
         stop();
     }
