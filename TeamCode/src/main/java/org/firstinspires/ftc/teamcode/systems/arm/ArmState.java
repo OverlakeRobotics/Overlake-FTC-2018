@@ -5,6 +5,5 @@ public enum ArmState
     ROTATING_TOP,
     ROTATING_BOTTOM,
     RELEASE_PIN,
-    FALLING,
     IDLE
 }

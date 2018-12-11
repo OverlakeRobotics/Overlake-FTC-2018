@@ -34,7 +34,7 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
         markerSystem.place();
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.BACKWARD);
         distanceSystem.driveAlongWallInches(40, 3, 6, 1, true);
-        parkOnCrator(1, initPitch, initRoll);
+        parkOnCrater(1, initPitch, initRoll);
 
         stop();
     }

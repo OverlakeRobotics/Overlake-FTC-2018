@@ -23,7 +23,7 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         markerSystem.place();
         sleep(3000);
         markerSystem.reset();
-        parkOnCrator(autonomousPower, initPitch, initRoll);
+        parkOnCrater(autonomousPower, initPitch, initRoll);
         stop();
     }
 }

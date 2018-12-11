@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
  */
 public class SlideSystem extends System
 {
-    private final double MaxWinchPower = 0.7;
+    private final double MaxWinchPower = 1;
     private final int EncoderTop = 8730;
 
     private DigitalChannel limitTop;
@@ -93,8 +93,8 @@ public class SlideSystem extends System
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTop())
         {
-            winch.setPower(rampTop.scaleX(winch.getCurrentPosition()));
-//            winch.setPower(MaxWinchPower);
+            //winch.setPower(rampTop.scaleX(winch.getCurrentPosition()));
+            winch.setPower(MaxWinchPower);
         }
         else
         {
@@ -107,7 +107,7 @@ public class SlideSystem extends System
      * @return Returns true if the slide is at the top
      */
     private boolean isAtTop() {
-        return !limitTop.getState() && !limitMiddle.getState();
+        return false;//!limitTop.getState() && !limitMiddle.getState()
     }
 
     /**
@@ -118,8 +118,8 @@ public class SlideSystem extends System
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom())
         {
-            winch.setPower(-rampBottom.scaleX(winch.getCurrentPosition()));
-//            winch.setPower(-MaxWinchPower);
+            //winch.setPower(-rampBottom.scaleX(winch.getCurrentPosition()));
+            winch.setPower(-MaxWinchPower);
         }
         else
         {
