@@ -21,7 +21,7 @@ public class IMUSystem extends System {
     public BNO055IMU imu;
     public BNO055IMU.Parameters parameters;
 
-    // State used for updating telemetry
+    // State used for updating log
     private Orientation angles;
     private Acceleration gravity;
 

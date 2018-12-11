@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.debuggers;
 
 import org.firstinspires.ftc.teamcode.systems.logging.FileLogger;
 import org.firstinspires.ftc.teamcode.systems.logging.ILogger;
+import org.firstinspires.ftc.teamcode.systems.logging.LoggingLevel;
 
 public class Debugger implements IOpModeDebugger
 {
@@ -18,7 +19,7 @@ public class Debugger implements IOpModeDebugger
             StackTraceElement stackTrace = e.getStackTrace()[i];
             int line = stackTrace.getLineNumber();
             String file = stackTrace.getFileName();
-            exceptionLogger.log(
+            exceptionLogger.error(
                 "Stack Trace Element",
                 "{0} line:{1} file:{2} depth: {3}\n",
                 e.toString(),
@@ -27,6 +28,5 @@ public class Debugger implements IOpModeDebugger
                 i + 1
             );
         }
-        exceptionLogger.write();
     }
 }

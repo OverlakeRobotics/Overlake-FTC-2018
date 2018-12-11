@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.systems.logging;
 
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 
 /**
  * A logger that logs to a file in the robot app directory
  */
-public class FileLogger implements ILogger
+public class FileLogger extends Logger
 {
     private LogWritter logWritter;
     private File logFile;
@@ -24,18 +25,13 @@ public class FileLogger implements ILogger
     /**
      * Logs to the file that holds logging data
      * @param name the key of the log on the file
+     * @param level the level of the log entry
      * @param data the raw string to be formatted
      * @param args the arguments to be put into the formatted string
      */
-    public void log(String name, Object data, Object... args) {
-        String line = StringFormatter.format("[{0}]: {1}", name, StringFormatter.format(data.toString(), args));
+    public void log(String name, LoggingLevel level, Object data, Object... args) {
+        String line = StringFormatter.format("[{0}] {2}: {1}", name, StringFormatter.format(data.toString(), args), level);
         logWritter.appendLine(line);
-    }
-
-    /**
-     * Writes to the logger file
-     */
-    public void write() {
         logWritter.flush();
     }
 }

@@ -58,8 +58,8 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 >>>>>>> master
 
             sleep(8000);
-            telemetry.addLine("reached wall");
-            telemetry.update();
+            log.addLine("reached wall");
+            log.update();
 
             distanceSystem.driveAlongWallToCrater(3, 6, 1);
 
@@ -75,9 +75,9 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 
         int counts = 6;
         for (int i = 0; i < counts; i++) {
-            telemetry.addLine("ticksLeft: " + ticksLeft);
-            telemetry.addLine("rampX: " + ramp.scaleX(ticksLeft));
-            telemetry.update();
+            log.addLine("ticksLeft: " + ticksLeft);
+            log.addLine("rampX: " + ramp.scaleX(ticksLeft));
+            log.update();
             ticksLeft -= (ticksLeft / 6);
             sleep(1000);
         }*/

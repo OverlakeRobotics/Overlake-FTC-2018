@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems.slide;
 
-import android.transition.Slide;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
-import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.LogarithmicRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
@@ -67,11 +64,10 @@ public class SlideSystem extends System
      * Runs the slide system
      */
     public void run() {
-        telemetry.log("Encoder", winch.getCurrentPosition());
-        telemetry.log("Top Power", rampTop.scaleX(winch.getCurrentPosition()));
-        telemetry.log("Bottom Power", rampBottom.scaleX(winch.getCurrentPosition()));
-        telemetry.log("Origin", winchOrigin);
-        telemetry.write();
+        log.info("Encoder", winch.getCurrentPosition());
+        log.info("Top Power", rampTop.scaleX(winch.getCurrentPosition()));
+        log.info("Bottom Power", rampBottom.scaleX(winch.getCurrentPosition()));
+        log.info("Origin", winchOrigin);
         switch (state) {
             case WINCHING_TO_TOP:
                 slideUp();

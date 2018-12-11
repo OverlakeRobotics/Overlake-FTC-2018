@@ -1,25 +1,17 @@
 package org.firstinspires.ftc.teamcode.systems.drive;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
 import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.IScale;
 import org.firstinspires.ftc.teamcode.components.scale.LinearScale;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
-import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class MecanumDriveSystem extends DriveSystem4Wheel
 {
@@ -59,8 +51,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         initPitch = imuSystem.getPitch();
         initRoll = imuSystem.getRoll();
 
-        telemetry.log("MecanumDriveSystem","power: {0}", 0);
-        telemetry.log("MecanumDriveSystem","distance: {0}", 0);
+        log.info("MecanumDriveSystem","power: {0}", 0);
+        log.info("MecanumDriveSystem","distance: {0}", 0);
     }
 
     /**
@@ -239,9 +231,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
             double scaledPower = shouldRamp ? ramp.scaleX(distance) : power;
 
             setPower(direction * scaledPower);
-            telemetry.log("MecanumDriveSystem", "distance left (ticks): " + getMinDistanceFromTarget());
-            telemetry.log("MecanumDriveSystem","scaled power: " + scaledPower);
-            telemetry.write();
+            log.info("MecanumDriveSystem", "distance left (ticks): " + getMinDistanceFromTarget());
+            log.info("MecanumDriveSystem","scaled power: " + scaledPower);
         }
         setPower(0);
     }
@@ -320,12 +311,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
         while (Math.abs(computeDegreesDiff(targetHeading, heading)) > 1) {
             double power = getTurnPower(ramp, targetHeading, heading);
-            telemetry.log("MecanumDriveSystem","heading: " + heading);
-            telemetry.log("MecanumDriveSystem","target heading: " + targetHeading);
-            telemetry.log("MecanumDriveSystem","power: " + power);
-            telemetry.log("MecanumDriveSystem","distance left: " + Math.abs(targetHeading - heading));
-            telemetry.write();
-
+            log.info("MecanumDriveSystem","heading: " + heading);
+            log.info("MecanumDriveSystem","target heading: " + targetHeading);
+            log.info("MecanumDriveSystem","power: " + power);
+            log.info("MecanumDriveSystem","distance left: " + Math.abs(targetHeading - heading));
 
             tankDrive(power, -power);
             heading = -imuSystem.getHeading();

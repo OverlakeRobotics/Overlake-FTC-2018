@@ -69,7 +69,7 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
-        telemetry.log("Arm Power", isRamping);
+        log.info("Arm Power", isRamping);
         switch (currentState) {
             case RELEASE_PIN:
                 releaseArmPin();

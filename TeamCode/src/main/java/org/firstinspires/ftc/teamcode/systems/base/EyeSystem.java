@@ -70,14 +70,13 @@ public class EyeSystem extends System {
     public void find(int seconds) {
         long startTime = java.lang.System.currentTimeMillis();
         while (((java.lang.System.currentTimeMillis() - startTime) / 1000) <= seconds) {
-            telemetry.log("Eye","startTime: " + startTime);
-            telemetry.log("Eye","currentTime: " + ((java.lang.System.currentTimeMillis() - startTime) / 1000));
+            log.info("Eye","startTime: " + startTime);
+            log.info("Eye","currentTime: " + ((java.lang.System.currentTimeMillis() - startTime) / 1000));
             if (rotation == null) {
                 look();
             } else {
                 return;
             }
-            telemetry.write();
         }
     }
 
@@ -86,7 +85,7 @@ public class EyeSystem extends System {
         targetVisible = false;
         for (VuforiaTrackable trackable : allTrackables) {
             if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                telemetry.log("Eye","Visible Target", trackable.getName());
+                log.info("Eye","Visible Target", trackable.getName());
                 targetVisible = true;
 
                 // getUpdatedRobotLocation() will return null if no new information is available since
@@ -103,15 +102,14 @@ public class EyeSystem extends System {
         if (targetVisible) {
             // express position (translation) of robot in inches.
             translation = lastLocation.getTranslation();
-            telemetry.log("Eye","Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+            log.info("Eye","Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                     translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
             rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            telemetry.log("Eye","Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+            log.info("Eye","Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
         }
         else {
-            telemetry.log("Eye","Visible Target", "none");
+            log.info("Eye","Visible Target", "none");
         }
-        telemetry.write();
     }
 
     public double getRoll() {

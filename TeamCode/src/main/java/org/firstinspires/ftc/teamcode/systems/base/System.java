@@ -10,13 +10,13 @@ public abstract class System {
     protected String systemName;
     protected HardwareMap hardwareMap;
     //public ConfigParser config;
-    public PhoneLogger telemetry;
+    public PhoneLogger log;
 
     public System(OpMode opMode, String systemName) {
         this.systemName = systemName;
         this.hardwareMap = opMode.hardwareMap;
         //this.config = new ConfigParser(systemName + ".omc");
-        this.telemetry = new PhoneLogger(opMode.telemetry);
+        this.log = new PhoneLogger(opMode.telemetry);
         try
         {
             //this.config = new ConfigParser(systemName + ".omc");

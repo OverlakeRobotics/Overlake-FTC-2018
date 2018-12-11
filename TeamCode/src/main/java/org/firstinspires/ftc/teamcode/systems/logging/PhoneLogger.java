@@ -6,34 +6,31 @@ import org.firstinspires.ftc.robotcore.external.Telemetry.Item;
 import java.util.HashMap;
 
 /**
- * A logger that build on top of the telemetry provided by the ftc core library
+ * A logger that build on top of the log provided by the ftc core library
  */
-public class PhoneLogger implements ILogger
+public class PhoneLogger extends Logger
 {
     private Telemetry telemetry;
 
     /**
      * Creates a logger to be used on the phone
-     * @param telemetry telemetry provided by the opmode
+     * @param telemetry log provided by the opmode
      */
     public PhoneLogger(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
 
     /**
-     * Logs to telemetry
-     * @param name name of the key that is being logged to in telemetry
-     * @param data raw string to be formatted
-     * @param args arguments to be put in the formatted string
+     * Logs to phone
+     * @param tag tag to log on the phone
+     * @param level level is ignored on the phone's log
+     * @param data data to be logged
+     * @param args arguments to be used when logging
      */
-    public void log(String name, Object data, Object... args) {
-        telemetry.addData(name, StringFormatter.format(data.toString(), args));
-    }
-
-    /**
-     * Updates the telemetry
-     */
-    public void write() {
+    @Override
+    public void log(String tag, LoggingLevel level, Object data, Object... args)
+    {
+        telemetry.addData(tag, StringFormatter.format(data.toString(), args));
         telemetry.update();
     }
 }
