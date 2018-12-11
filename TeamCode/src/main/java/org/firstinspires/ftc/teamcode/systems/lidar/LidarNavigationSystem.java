@@ -120,7 +120,7 @@ public class LidarNavigationSystem extends System {
         telemetry.write();
     }
 
-    public void correctToFollowWall(double closeBuffer, double farBuffer, double correctionPower,
+    private void correctToFollowWall(double closeBuffer, double farBuffer, double correctionPower,
                                     StopCondition stopCondition) {
         boolean isOutOfBounds = isOutOfBounds(closeBuffer, farBuffer);
         if (isOutOfBounds) {
@@ -202,34 +202,50 @@ public class LidarNavigationSystem extends System {
         driveSystem.setPower(0);
     }
 
-    public double[] getCorrectionTurnPower(double closeBuffer, double farBuffer, double power) {
-        double turnPower = (power / 2);
-        double rightPower = turnPower;
-        double leftPower = turnPower;
+    public void strafeTowardWall(double targetDistanceFromWall, double wallHeading, double power) {
+        driveSystem.turnAbsolute(wallHeading, power);
+        driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);
+        driveSystem.setPower(power);
+
+        while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
+            driveSystem.setPower(power);
+            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
+            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
+            telemetry.write();
+        }
+        driveSystem.setPower(0);
+    }
+
+    private double[] getCorrectionTurnPower(double closeBuffer, double farBuffer, double power) {
+        double highPoweredSideturnPower = (power / 2);
+        double lowPoweredSideTurnPower = (power / 5);
+        double rightPower = highPoweredSideturnPower;
+        double leftPower = highPoweredSideturnPower;
         if ((((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) && !(getDistance2() >= farBuffer)) ||
                 ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
             if (power > 0) {
                 telemetry.log("driveTest", "turning RIGHT");
-                rightPower = 0;
-                leftPower = turnPower;
+                rightPower = lowPoweredSideTurnPower;
+                leftPower = highPoweredSideturnPower;
             } else {
                 telemetry.log("driveTest", "turning LEFT");
-                rightPower = turnPower;
-                leftPower = 0;
+                rightPower = highPoweredSideturnPower;
+                leftPower = lowPoweredSideTurnPower;
             }
         } else if ((((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer))) ||
                 ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
             if (power > 0) {
                 telemetry.log("driveTest", "turning LEFT");
-                rightPower = turnPower;
-                leftPower = 0;
+                rightPower = highPoweredSideturnPower;
+                leftPower = lowPoweredSideTurnPower;
             } else {
                 telemetry.log("driveTest", "turning RIGHT");
-                rightPower = 0;
-                leftPower = turnPower;
+                rightPower = lowPoweredSideTurnPower;
+                leftPower = highPoweredSideturnPower;
             }
         }
         double[] powers = new double[] {leftPower, rightPower};
+        telemetry.write();
         return powers;
     }
 
@@ -248,9 +264,6 @@ public class LidarNavigationSystem extends System {
 
     public void alignWithWall(double maxPower) {
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
-
-        double targetHeading = 0;
-
         driveSystem.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Between 90 (changed from 130) and 2 degrees away from the target
@@ -260,7 +273,6 @@ public class LidarNavigationSystem extends System {
         while (Math.abs(getDistance1() - getDistance2()) > 0.05) {
             double power = driveSystem.getTurnPower(ramp, getDistance2(), getDistance1());
             telemetry.log("MecanumDriveSystem","heading: " + (getDistance2() - getDistance1()));
-            telemetry.log("MecanumDriveSystem","target heading: " + targetHeading);
             telemetry.log("MecanumDriveSystem","power: " + power);
             telemetry.write();
 

@@ -37,35 +37,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
             /////distanceSystem.getCloseToWall(18, 0.4);
 
 
-            /*distanceSystem.getCloseToWall(7, -0.7);
-
-            sleep(8000);
-            telemetry.addLine("reached wall");
-            telemetry.update();
-
-            distanceSystem.driveAlongWallToCrater(3, 6, 1);
-
-            sleep(3000);
-
-            distanceSystem.driveAlongWallToDepot(3, 6, -1);
-
-
-            //driveSystem.driveToPositionInches(30, 1);*/
-
-        /*int ticksLeft = 3000;
-        ExponentialRamp ramp = new ExponentialRamp(new Point(0, 0.1), new Point(ticksLeft, 1));
-
-        int counts = 6;
-        for (int i = 0; i < counts; i++) {
-            telemetry.addLine("ticksLeft: " + ticksLeft);
-            telemetry.addLine("rampX: " + ramp.scaleX(ticksLeft));
-            telemetry.update();
-            ticksLeft -= (ticksLeft / 6);
-            sleep(1000);
-        }*/
-
-
-            //driveSystem.driveToPositionInches(15, 1);
+            
         if (zone == 0) {
             for (int i = 0; i < 50000; i++) {
                 distanceSystem.telemetry();
@@ -75,16 +47,44 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
         } else if (zone == 1) {
             distanceSystem.getCloseToWall(12, 0.5);
         } else if (zone == 2) {
+            telem("about to reset",1);
             markerSystem.reset();
-            telem("just reset", 1);
+            telem("just reset, about to place", 1);
             markerSystem.place();
-            telem("just place", 1);
+            telem("just placed", 1);
         } else if (zone == 4) {
-            telem("about to FUK", 1);
+            telem("driveAlongWallInches(300, 3, 6, 0.8, true)", 1);
             distanceSystem.driveAlongWallInches(300, 3, 6, 0.8, true);
+        } else if (zone == 5) {
+            craterSide();
+        } else if (zone == 6) {
+            distanceSystem.strafeTowardWall(1, cratApproachDeg1, 1);
+        } else if (zone == 7) {
+            distanceSystem.alignWithWall(1);
+        } else if (zone == 8) {
+            for (int i = 0; i < 50000; i++) {
+                colorSystem.telemetry();
+                sleep(10);
+            }
         }
+
+
             // FR BL BR FL
 
             stop();
+        }
+
+        private void craterSide() {
+            driveSystem.driveToPositionInches(backCubeIn, -autonoPower, false);
+            driveSystem.turnAbsolute(cratApproachDeg0, autonoPower);
+            distanceSystem.getCloseToWall(cratTargDist1, toWallPow);
+            //driveSystem.turnAbsolute(cratApproachDeg1, 1);
+            //distanceSystem.getCloseToWall(7, 0.8);
+            driveSystem.turnAbsolute(cratApproachDeg1, autonoPower);
+            parkInDepot(-autonoPower, colorSystem);
+            markerSystem.reset();
+            sleep(300);
+            parkOnCrator(autonoPower, initPitch, initRoll);
+            markerSystem.reset();
         }
 }
