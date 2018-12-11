@@ -7,7 +7,6 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmDirection;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
-import org.firstinspires.ftc.teamcode.systems.arm.AutonomousArm;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.lidar.LidarNavigationSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
@@ -27,6 +26,10 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    private static final String TAG = "TensorFlowTelemetry";
+
+    private static final int CENTER = 750;
+    private static final int OFFSET = 50;
 
     private TensorFlow tensorFlow;
     private boolean hasDriven;
@@ -39,7 +42,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public ColorSystem colorSystem;
     public LidarNavigationSystem distanceSystem;
     public Marker markerSystem;
-    public AutonomousArm arm;
+    public ArmSystem arm;
 
     public double initPitch;
     public double initRoll;
@@ -75,7 +78,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         colorSystem = new ColorSystem(this);
         distanceSystem = new LidarNavigationSystem(this, driveSystem, colorSystem);
         markerSystem = new Marker(this);
-        arm = new AutonomousArm(this);
+        arm = new ArmSystem(this);
 
         zone = config.getInt("zone");
         backCubeIn = config.getInt("backCubeIn");//10
@@ -103,7 +106,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         driveSystem.setPower(0);
     }
 
-    public void parkOnCrater(double maxPower, double initPitch, double initRoll) {
+    public void parkOnCrator(double maxPower, double initPitch, double initRoll) {
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
         driveSystem.setPower(maxPower);
 
@@ -121,17 +124,22 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     }
 
     public void delatch() {
-        arm.delatch(driveSystem);
-        driveToSamplePosition();
-        arm.collapse();
-        sleep(500);
-        driveSystem.mecanumDriveXY(0,0);
-    }
-
-    private void driveToSamplePosition() {
+        arm.toggleRamping();
+        arm.runMotors(ArmDirection.DOWN);
+        arm.releaseArmPin();
+        sleep(1000);
+        arm.stop();
+        sleep(1000);
+        driveSystem.mecanumDriveXY(0.3, 0);
+        sleep(750);
         driveSystem.mecanumDriveXY(0, -0.3);
         sleep(500);
         driveSystem.mecanumDriveXY(-0.35,0.1);
+        arm.toggleRamping();
+        arm.runMotors(ArmDirection.DOWN);
+        sleep(500);
+        arm.stop();
+        driveSystem.mecanumDriveXY(0,0);
     }
 
     public void sample() {
