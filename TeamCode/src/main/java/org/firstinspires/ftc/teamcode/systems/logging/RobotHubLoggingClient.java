@@ -8,13 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public class RobotHubLoggingClient implements Runnable
@@ -40,10 +36,9 @@ public class RobotHubLoggingClient implements Runnable
             loggingOutput = new DataOutputStream(loggingSocket.getOutputStream());
             while (isRunning) {
                if (!loggingEntryQueue.isEmpty()) {
-                    this.sendEntry();
+                   this.sendEntry();
                }
             }
-            loggingSocket.close();
         }
         catch (IOException e)
         {
@@ -52,12 +47,27 @@ public class RobotHubLoggingClient implements Runnable
     }
 
     public void addLoggingEntry(LoggingEntry entry) {
-        loggingEntryQueue.add(entry);
+        if (loggingSocket != null && loggingSocket.isConnected()) {
+            loggingEntryQueue.add(entry);
+        }
     }
 
     private synchronized void sendEntry() throws IOException
     {
-        String message = gson.toJson(loggingEntryQueue.remove());
+        String message = gson.toJson(loggingEntryQueue.remove()) + "\n";
         loggingOutput.writeBytes(message);
+    }
+
+    public void stop() {
+        isRunning = false;
+        try
+        {
+            loggingSocket.close();
+            loggingOutput.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

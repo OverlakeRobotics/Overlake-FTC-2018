@@ -20,5 +20,7 @@ public class LoggerTestOpMode extends LinearOpMode
         RobotHubLogger logger = new RobotHubLogger();
         waitForStart();
         logger.info("Arm System", "Hello world!");
+        logger.error("Arm System", "Total failure");
+        logger.stop();
     }
 }

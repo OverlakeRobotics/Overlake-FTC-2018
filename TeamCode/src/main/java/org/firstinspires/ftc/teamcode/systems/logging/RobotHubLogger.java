@@ -2,12 +2,11 @@ package org.firstinspires.ftc.teamcode.systems.logging;
 
 public class RobotHubLogger extends Logger
 {
-    Thread robotHubLoggingThread;
     RobotHubLoggingClient robotHubLoggingClient;
 
     public RobotHubLogger() {
         robotHubLoggingClient = new RobotHubLoggingClient();
-        robotHubLoggingThread = new Thread(robotHubLoggingClient);
+        Thread robotHubLoggingThread = new Thread(robotHubLoggingClient);
         robotHubLoggingThread.start();
     }
 
@@ -15,5 +14,9 @@ public class RobotHubLogger extends Logger
     public void log(String tag, LoggingLevel level, Object data, Object... args)
     {
         robotHubLoggingClient.addLoggingEntry(new LoggingEntry(tag, level, StringFormatter.format(data.toString(), args)));
+    }
+
+    public void stop() {
+        robotHubLoggingClient.stop();
     }
 }
