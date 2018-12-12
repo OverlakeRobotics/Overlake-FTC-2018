@@ -23,11 +23,18 @@ public class ArmSystem extends System {
     private AnalogInput potentiometer;
     private Ramp rampUp;
     private Ramp rampDown;
+    private Ramp fallingRamp;
 
-    private final double PotentiometerMaximum = 1.9;
-    private final double PotentiometerMinimum = 0.8;
-    private final double MaxPower = 0.2;
-    private final double MinPower = 0.01;
+    private final double MaximumVoltage = 2.3;
+    private final double MinimumVoltage = 0.75;
+    private final double LatchVoltage = 0.98;
+    public final double LatchPreparationVoltage = 1.7;
+    private final double LatchPreparationMargin = 0.5;
+    private final double WheelVoltage = 1.4 ;
+    private final double MaxPower = 0.5;
+    private final double LatchPower = 1;
+    private final double MinPower = 0.15;
+    private boolean isRamping;
 
     private ArmState currentState;
 
@@ -41,14 +48,15 @@ public class ArmSystem extends System {
         motor2 = hardwareMap.dcMotor.get("parallelM2");
         armRelease = hardwareMap.servo.get("armRelease");
         potentiometer = hardwareMap.get(AnalogInput.class, "potentiometer");
+        isRamping = true;
         setState(ArmState.IDLE);
         rampUp = new LogarithmicRamp(
-                new Point(PotentiometerMaximum / 2, MaxPower),
-                new Point(PotentiometerMaximum, MinPower)
+            new Point(MaximumVoltage / 2, MaxPower),
+            new Point(MaximumVoltage, MinPower)
         );
         rampDown = new LogarithmicRamp(
-                new Point(PotentiometerMinimum, MinPower),
-                new Point(PotentiometerMaximum / 2, MaxPower)
+            new Point(MinimumVoltage, MinPower),
+            new Point(MaximumVoltage / 2, MaxPower)
         );
     }
 
@@ -64,7 +72,7 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
-        telemetry.log("voltage", potentiometer.getVoltage());
+        telemetry.log("Arm Power", potentiometer.getVoltage());
         telemetry.write();
         switch (currentState) {
             case RELEASE_PIN:
@@ -89,8 +97,7 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtBottom()) {
-            motor1.setPower(MaxPower);
-            motor2.setPower(-MaxPower);
+            runMotors(ArmDirection.DOWN);
         } else {
             stop();
         }
@@ -100,8 +107,24 @@ public class ArmSystem extends System {
      * Checks if the arm is at the bottom
      * @return Returns true if the arm is at the bottom
      */
-    private boolean isAtBottom() {
-        return potentiometer.getVoltage() <= PotentiometerMinimum;
+    public boolean isAtBottom() {
+        return potentiometer.getVoltage() <= MinimumVoltage;
+    }
+
+    /**
+     * Runs the motors in a given direction
+     * @param direction The direction to run the motors
+     */
+    public void runMotors(ArmDirection direction) {
+        if (direction == ArmDirection.DOWN) {
+            double power = getPower(rampDown);
+            motor1.setPower(power);
+            motor2.setPower(-power);
+        } else {
+            double power = getPower(rampUp);
+            motor1.setPower(-power);
+            motor2.setPower(power);
+        }
     }
 
     /**
@@ -111,8 +134,7 @@ public class ArmSystem extends System {
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (!isAtTopPosition()) {
-            motor1.setPower(-MaxPower);
-            motor2.setPower(MaxPower);
+            runMotors(ArmDirection.UP);
         } else {
             stop();
         }
@@ -122,24 +144,46 @@ public class ArmSystem extends System {
      * Checks that the arm is at the top
      * @return Returns true if the arm is at the top
      */
-    private boolean isAtTopPosition() {
-        return potentiometer.getVoltage() >= PotentiometerMaximum;
+    public boolean isAtTopPosition() {
+        return potentiometer.getVoltage() >= MaximumVoltage;
     }
 
     /**
      * Stops the arm from running
      */
-    private void stop() {
+    public void stop() {
         setState(ArmState.IDLE);
         motor1.setPower(0);
         motor2.setPower(0);
     }
 
     /**
+     * toggles the ramping of the robot
+     */
+    public void toggleRamping() {
+        isRamping = !isRamping;
+    }
+
+    /**
+     * sets the power of the robot
+     */
+    private double getPower(Ramp ramp) {
+        if (isRamping) {
+            return ramp.scaleX(potentiometer.getVoltage());
+        } else {
+            return LatchPower;
+        }
+    }
+
+    /**
      * Releases the pin of that holds the arm up when latching
      */
     public void releaseArmPin() {
-        armRelease.setPosition(0.9);
+        fallingRamp = new LogarithmicRamp(
+                new Point(0.0001, 0.1),
+                new Point(potentiometer.getVoltage(), MaxPower)
+        );
+        armRelease.setPosition(0);
         setState(ArmState.IDLE);
     }
 
@@ -147,7 +191,39 @@ public class ArmSystem extends System {
      * Sets the pin of that holds the arm up when latching
      */
     public void setArmPin() {
-        armRelease.setPosition(0.4);
+        armRelease.setPosition(0.7);
         setState(ArmState.IDLE);
+    }
+
+    /**
+     * Gets the position of the potentiometer
+     * @return the potentiometer voltage
+     */
+    public ArmDirection getDirectionToRun(double voltage) {
+        return voltage >= potentiometer.getVoltage() ?
+                ArmDirection.DOWN :
+                ArmDirection.UP;
+    }
+
+    /**
+     * Checks if the arm is prepared to latch
+     * @return Returns true if the arm is prepared to latch
+     */
+    public boolean canLatch() {
+        return potentiometer.getVoltage() >= LatchPreparationVoltage - LatchPreparationMargin &&
+                potentiometer.getVoltage() <= LatchPreparationVoltage + LatchPreparationMargin;
+    }
+
+
+    /**
+     * Checks if the arm is collapsed and latched on the lander
+     * @return true if the arm is collapsed and latched on the lander
+     */
+    public boolean isLatched() {
+        return LatchVoltage >= potentiometer.getVoltage();
+    }
+
+    public boolean wheelsOnGround() {
+        return WheelVoltage <= potentiometer.getVoltage();
     }
 }

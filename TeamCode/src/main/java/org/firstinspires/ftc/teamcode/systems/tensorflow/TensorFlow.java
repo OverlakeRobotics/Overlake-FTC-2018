@@ -39,7 +39,7 @@ public class TensorFlow extends System
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.95;
+        tfodParameters.minimumConfidence = 0.6;
         tensorFlowObjectDetector = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
     }
 

@@ -37,9 +37,11 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 
             // 0 is red crator
 
+            distanceSystem.getCloseToWall(18, 0.4);
             /////distanceSystem.getCloseToWall(18, 0.4);
 
 
+>>>>>>> origin/ecoulson/Autonomous
 
         if (zone == 0) {
             for (int i = 0; i < 50000; i++) {
