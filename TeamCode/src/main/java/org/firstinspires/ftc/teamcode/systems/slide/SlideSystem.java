@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import org.firstinspires.ftc.teamcode.components.scale.LogarithmicRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.base.System;
 
 /**
@@ -30,7 +31,7 @@ public class SlideSystem extends System
      * Creates a new linear slide system in the current opmode
      * @param opMode current opmode being executed
      */
-    public SlideSystem(OpMode opMode)
+    public SlideSystem(IBaseOpMode opMode)
     {
         super(opMode, "SlideSystem");
         winch = hardwareMap.dcMotor.get("winch");

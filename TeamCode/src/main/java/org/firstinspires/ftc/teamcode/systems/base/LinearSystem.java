@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.systems.base;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+
 /**
  * Created by MichaelSimpson on 3/15/2018.
  */
@@ -14,7 +16,7 @@ public abstract class LinearSystem extends System {
     protected int max;
     protected double[] positions;
 
-    public LinearSystem(OpMode opMode, String systemName) {
+    public LinearSystem(IBaseOpMode opMode, String systemName) {
         super(opMode, systemName);
 
         //this.positions = new double[config.getInt("arraySize")];

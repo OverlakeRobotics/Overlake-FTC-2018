@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.components.scale.LogarithmicRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.base.System;
 
 /**
@@ -39,7 +40,7 @@ public class ArmSystem extends System {
      * Builds a new Arm System for the given opmode
      * @param opMode the opmode that the arm system is currently running on
      */
-    public ArmSystem(OpMode opMode) {
+    public ArmSystem(IBaseOpMode opMode) {
         super(opMode, "ArmSystem");
         motor1 = hardwareMap.dcMotor.get("parallelM1");
         motor2 = hardwareMap.dcMotor.get("parallelM2");

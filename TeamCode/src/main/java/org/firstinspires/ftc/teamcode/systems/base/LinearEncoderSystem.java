@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
 import org.firstinspires.ftc.teamcode.components.limitswitch.LimitSwitch;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 
 /**
  * Created by Michael on 3/15/2018.
@@ -31,7 +32,7 @@ public abstract class LinearEncoderSystem extends LinearSystem {
     private DriveMotor dcMotor;
 
 
-    public LinearEncoderSystem(OpMode opMode, String systemName, int maxTicks, DcMotor dcMotor,
+    public LinearEncoderSystem(IBaseOpMode opMode, String systemName, int maxTicks, DcMotor dcMotor,
                                LimitSwitch maxLimitSensor, LimitSwitch minLimitSensor) {
         super(opMode, systemName);
 

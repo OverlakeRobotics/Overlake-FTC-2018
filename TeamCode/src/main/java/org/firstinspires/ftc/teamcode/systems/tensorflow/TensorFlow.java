@@ -6,6 +6,8 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.opmodes.BaseOpMode;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.base.System;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class TensorFlow extends System
     private TFObjectDetector tensorFlowObjectDetector;
     private static final String VUFORIA_KEY = "AfIW5rj/////AAAAGaDrYjvjtkibrSYzQTjEFjJb+NGdODG1LJE2IVqxl0wdLW+9JZ3nIyQF2Hef7GlSLQxR/6SQ3pkFudWmzU48zdcBEYJ+HCwOH3vKFK8gJjuzrcc7nis7JrU+IMTONPctq+JTavtRk+LBhM5bxiFJhEO7CFnDqDDEFc5f720179XJOvZZA0nuCvIqwSslb+ybEVo/G8BDwH1FjGOaH/CxWaXGxVmGd4zISFBsMyrwopDI2T0pHdqvRBQ795QCuJFQjGQUtk9UU3hw/E8Z+oSC36CSWZPdpH3XkKtvSb9teM5xgomeEJ17MdV+XwTYL0iB/aRXZiXRczAtjrcederMUrNqqS0o7XvYS3eW1ViHfynl";
 
-    public TensorFlow(OpMode opMode) {
+    public TensorFlow(IBaseOpMode opMode) {
         super(opMode, "TensorFlow");
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -43,16 +45,28 @@ public class TensorFlow extends System
         tensorFlowObjectDetector = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
     }
 
+    /**
+     * Loads an asset to tensor flow
+     * @param assetFile name of the asset file
+     * @param label label for the asset to load from the file
+     */
     public void loadModelFromAsset(String assetFile, String label) {
         tensorFlowObjectDetector.loadModelFromAsset(assetFile, label);
     }
 
+    /**
+     * Activates tensor flow
+     */
     public void activate() {
         if (tensorFlowObjectDetector != null) {
             tensorFlowObjectDetector.activate();
         }
     }
 
+    /**
+     * Gets list of updated recognitions from tensor flow object detector
+     * @return Returns list of updated recognitions
+     */
     public List<Recognition> getUpdatedRecognitions() {
         List<Recognition> recognitionList = tensorFlowObjectDetector.getUpdatedRecognitions();
         if (recognitionList == null) {
@@ -62,6 +76,9 @@ public class TensorFlow extends System
         }
     }
 
+    /**
+     * Stops tensor flow
+     */
     public void shutDown() {
         if (tensorFlowObjectDetector != null) {
             tensorFlowObjectDetector.shutdown();

@@ -8,4 +8,5 @@ public interface ILogger
     void verbose(String tag, Object data, Object... args);
     void debug(String tag, Object data, Object... args);
     void silly(String tag, Object data, Object... args);
+    void close();
 }

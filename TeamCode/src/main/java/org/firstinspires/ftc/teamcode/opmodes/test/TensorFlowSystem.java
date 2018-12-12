@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.opmodes.BaseLinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
@@ -53,7 +54,8 @@ import java.util.List;
 
 
 @Autonomous(name = "tensor_flow")
-public class TensorFlowSystem extends LinearOpMode {
+public class TensorFlowSystem extends BaseLinearOpMode
+{
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";

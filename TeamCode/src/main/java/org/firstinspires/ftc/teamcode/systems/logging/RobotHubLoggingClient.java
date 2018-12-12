@@ -19,7 +19,7 @@ public class RobotHubLoggingClient implements Runnable
     DataOutputStream loggingOutput;
     Queue<LoggingEntry> loggingEntryQueue;
     Gson gson;
-    volatile boolean isRunning;
+    boolean isRunning;
 
     public RobotHubLoggingClient() {
         isRunning = true;
@@ -32,7 +32,7 @@ public class RobotHubLoggingClient implements Runnable
     {
         try
         {
-            loggingSocket = new Socket(new InetSocketAddress(7001).getAddress(), 7001);
+            loggingSocket = new Socket("192.168.49.1", 7001);
             loggingOutput = new DataOutputStream(loggingSocket.getOutputStream());
             while (isRunning) {
                if (!loggingEntryQueue.isEmpty()) {
@@ -54,20 +54,15 @@ public class RobotHubLoggingClient implements Runnable
 
     private synchronized void sendEntry() throws IOException
     {
-        String message = gson.toJson(loggingEntryQueue.remove()) + "\n";
-        loggingOutput.writeBytes(message);
-    }
-
-    public void stop() {
-        isRunning = false;
-        try
-        {
+        LoggingEntry entry = loggingEntryQueue.remove();
+        if (entry == null) {
+            isRunning = false;
+            loggingOutput.flush();
             loggingSocket.close();
-            loggingOutput.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+        } else {
+            String message = gson.toJson(entry) + "\n";
+            loggingOutput.writeBytes(message);
+            loggingOutput.flush();
         }
     }
 }

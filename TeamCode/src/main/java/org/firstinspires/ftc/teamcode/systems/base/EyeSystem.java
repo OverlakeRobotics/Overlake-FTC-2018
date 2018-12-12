@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class EyeSystem extends System {
     Orientation rotation;
     VectorF translation;
 
-    public EyeSystem(OpMode opMode) {
+    public EyeSystem(IBaseOpMode opMode) {
         super(opMode, "EyeSystem");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());

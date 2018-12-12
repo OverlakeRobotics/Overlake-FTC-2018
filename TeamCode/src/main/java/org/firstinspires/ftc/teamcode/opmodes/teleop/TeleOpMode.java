@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.controller.Controller;
 import org.firstinspires.ftc.teamcode.hardware.controller.Handler;
-import org.firstinspires.ftc.teamcode.opmodes.debuggers.TeleOpModeDebugger;
+import org.firstinspires.ftc.teamcode.opmodes.BaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.flail.Flail;
+import org.firstinspires.ftc.teamcode.systems.logging.ILogger;
 import org.firstinspires.ftc.teamcode.systems.slide.SlideState;
 import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
 
@@ -16,7 +18,8 @@ import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
  * Created by idiot on 10/11/17.
  */
 @TeleOp(name = "CompetitionTeleOp", group="TeleOp")
-public class TeleOpMode extends TeleOpModeDebugger {
+public class TeleOpMode extends BaseOpMode
+{
     private Controller controller1;
     private MecanumDriveSystem driveSystem;
     private ArmSystem armSystem;
@@ -38,15 +41,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
         this.driveSystem = new MecanumDriveSystem(this);
         this.flail = new Flail(this);
         initButton();
-
         slowDrive = false;
-    }
-
-
-    @Override
-    public void initialize()
-    {
-
     }
 
     public void initButton() {
@@ -182,7 +177,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
     }
 
     @Override
-    public void run(){
+    public void loop(){
         controller1.handle();
         armSystem.run();
         slideSystem.run();

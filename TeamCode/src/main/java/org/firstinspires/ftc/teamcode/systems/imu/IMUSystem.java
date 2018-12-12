@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.base.System;
 
 import java.util.Locale;
@@ -29,7 +30,7 @@ public class IMUSystem extends System {
      * Creates a new IMU System
      * @param opMode the opmode the system is running in
      */
-    public IMUSystem(OpMode opMode)
+    public IMUSystem(IBaseOpMode opMode)
     {
         super(opMode, "IMUSystem");
 

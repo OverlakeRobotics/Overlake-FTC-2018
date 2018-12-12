@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.systems.color;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.base.System;
 
 
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
 
         private ColorSensor colorSensor;
 
-        public ColorSystem(OpMode opMode) {
+        public ColorSystem(IBaseOpMode opMode) {
             super(opMode, "ColorSystem");
 
             colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");

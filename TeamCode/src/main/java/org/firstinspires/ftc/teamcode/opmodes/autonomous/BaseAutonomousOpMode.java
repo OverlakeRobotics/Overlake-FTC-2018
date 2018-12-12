@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
+import org.firstinspires.ftc.teamcode.opmodes.BaseLinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmDirection;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by EvanCoulson on 10/11/17.
  */
 
-public abstract class BaseAutonomousOpMode extends LinearOpMode
+public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";

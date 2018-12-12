@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.components.scale.IScale;
 import org.firstinspires.ftc.teamcode.components.scale.LinearScale;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 
 public class MecanumDriveSystem extends DriveSystem4Wheel
@@ -36,7 +37,7 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
      * Constructs a new MecanumDriveSystem object.
      * @param opMode
      */
-    public MecanumDriveSystem(OpMode opMode) {
+    public MecanumDriveSystem(IBaseOpMode opMode) {
         super(opMode);
 
         //this.config = new ConfigParser("Testy.omc");

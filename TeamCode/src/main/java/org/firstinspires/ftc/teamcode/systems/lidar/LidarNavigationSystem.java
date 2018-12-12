@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 import org.firstinspires.ftc.teamcode.systems.base.System;
@@ -30,9 +31,9 @@ public class LidarNavigationSystem extends System {
     double initPitch;
     double initRoll;
 
-    public LidarNavigationSystem(OpMode opMode, MecanumDriveSystem driveSystem, ColorSystem colorSystem) {
+    public LidarNavigationSystem(IBaseOpMode opMode, MecanumDriveSystem driveSystem, ColorSystem colorSystem) {
         super(opMode, "DriveSystem4Wheel");
-        this.hwmap = opMode.hardwareMap;
+        this.hwmap = opMode.getHardwareMap();
         this.driveSystem = driveSystem;
         imu = new IMUSystem(opMode);
         this.colorSystem = colorSystem;
