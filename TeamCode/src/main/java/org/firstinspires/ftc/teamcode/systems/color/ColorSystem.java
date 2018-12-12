@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems.color;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 
 

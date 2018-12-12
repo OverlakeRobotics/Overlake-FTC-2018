@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.systems.base;
+package org.firstinspires.ftc.teamcode.systems.linear;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -15,7 +14,8 @@ import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
  * Created by Michael on 3/15/2018.
  */
 
-public abstract class LinearEncoderSystem extends LinearSystem {
+public abstract class LinearEncoderSystem extends LinearSystem
+{
 
     private static double REGRESS_POWER = 0.2;
     private static double RAMP_POWER_CUTOFF = 0.3;

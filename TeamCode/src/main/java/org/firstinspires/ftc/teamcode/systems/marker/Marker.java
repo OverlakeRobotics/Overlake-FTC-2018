@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems.marker;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * Runs a servo to release a marker attached to the side of the robot.

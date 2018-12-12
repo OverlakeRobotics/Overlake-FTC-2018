@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.systems.base;
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+package org.firstinspires.ftc.teamcode.systems.linear;
 
 import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * Created by MichaelSimpson on 3/15/2018.
  */
 
-public abstract class LinearSystem extends System {
+public abstract class LinearSystem extends System
+{
 
     protected static final double ABSOLUTE_MAX = 1.0;
     protected static final double ABSOLUTE_MIN = 0.0;
