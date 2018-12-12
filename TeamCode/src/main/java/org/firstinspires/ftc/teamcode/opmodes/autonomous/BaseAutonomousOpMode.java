@@ -30,6 +30,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public int cratApproachDeg0; //the angle at which the robot approaches the wall after tensor flow
     public int cratApproachDeg1; // reletive to starting position
     public int approachDeg2;
+    public double cratToWallHeading;
     public double cratTargDist1;
     public int cratTargDist2;
     public int cratTargDist3;
@@ -46,7 +47,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
 
     public double CRITICAL_ANGLE = 1.5;
     int RED_TRGGER_VALUE = 12;
-    int BLUE_TRIGGER_VALUE = 8;
+    int BLUE_TRIGGER_VALUE = 12;
 
     public BaseAutonomousOpMode(String opModeName)
     {
@@ -67,6 +68,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
 
         cratApproachDeg0 = config.getInt("cratApproachDeg0");//-90
         cratApproachDeg1 = config.getInt("cratApproachDeg1");//-120
+        cratToWallHeading = config.getDouble("cratToWallHeading");
         cratTargDist1 = config.getDouble("cratTargDist1");
         cratTargDist2 = config.getInt("cratTargDist2");
         cratTargDist3 = config.getInt("cratTargDist3");

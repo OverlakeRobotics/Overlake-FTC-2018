@@ -81,9 +81,17 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
                         MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT, autonoPower, false);
             }
         } else if (zone == 10) {
-            driveSystem.turnAbsolute(135, autonoPower);
+            driveSystem.turnAbsolute(-45, autonoPower);
         } else if (zone == 11) {
             driveSystem.turn(135, autonoPower);
+        } else if (zone == 12) {
+            distanceSystem.strafeTowardWallPolar(inFromWall, cratApproachDeg1, cratToWallHeading, autonoPower);
+        } else if (zone == 13) {
+            driveSystem.mecanumDrivePolar(cratToWallHeading, autonoPower);
+            sleep(10000);
+        } else if (zone == 14) {
+            driveSystem.mecanumDriveXY(-0.707, -0.707);
+            sleep(10000);
         }
 
 

@@ -202,6 +202,22 @@ public class LidarNavigationSystem extends System {
         driveSystem.setPower(0);
     }
 
+    public void strafeTowardWallPolar(double targetDistanceFromWall, double wallHeading, double driveHeading,
+                                      double power) {
+        driveSystem.turnAbsolute(wallHeading, power);
+        driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveSystem.mecanumDrivePolar(driveHeading, power);
+
+        while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
+            driveSystem.mecanumDrivePolar(driveHeading, power);
+            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
+            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
+            telemetry.write();
+        }
+        driveSystem.setPower(0);
+    }
+
     public void strafeTowardWall(double targetDistanceFromWall, double wallHeading, double power) {
         driveSystem.turnAbsolute(wallHeading, power);
         driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);

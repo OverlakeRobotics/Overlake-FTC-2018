@@ -159,6 +159,8 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
     }
 
     public void mecanumDriveXY(double x, double y) {
+        setDirection(DriveDirection.FORWARD);
+        setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.motorFrontRight.setPower(Range.clip(y + x, -1, 1));
         this.motorBackRight.setPower(Range.clip(y - x, -1, 1));
         this.motorFrontLeft.setPower(Range.clip(y - x, -1, 1));
@@ -167,10 +169,11 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     /**
      * Drives using a polar coordinate system
-     * @param radians the radians value
+     * @param degrees the degrees value
      * @param power The power of the motors
      */
-    public void mecanumDrivePolar(double radians, double power) {
+    public void mecanumDrivePolar(double degrees, double power) {
+        double radians = Math.toRadians(degrees);
         double x = Math.cos(radians) * power;
         double y = Math.sin(radians) * power;
         mecanumDriveXY(x, y);
