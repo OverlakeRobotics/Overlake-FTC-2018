@@ -17,13 +17,13 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         waitForStart();
         delatch();
         sample();
-        distanceSystem.getCloseToWall(cratTargDist1, powerToWall);
+        driveSystem.driveToPositionInches(50, -1);
         driveSystem.turnAbsolute(cratApproachDeg1, autonomousPower);
         parkInDepot(-autonomousPower, colorSystem);
         markerSystem.place();
         sleep(3000);
         markerSystem.reset();
-        parkOnCrator(autonomousPower, initPitch, initRoll);
+        driveSystem.driveToPositionInches(100, 1);
         stop();
     }
 }

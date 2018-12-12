@@ -27,7 +27,10 @@ public class ArmSystem extends System {
 
     private final double MaximumVoltage = 2.3;
     private final double MinimumVoltage = 0.75;
-    private final double LatchVoltage = 1.3;
+    private final double LatchVoltage = 0.98;
+    public final double LatchPreparationVoltage = 1.7;
+    private final double LatchPreparationMargin = 0.5;
+    private final double WheelVoltage = 1.4 ;
     private final double MaxPower = 0.5;
     private final double LatchPower = 1;
     private final double MinPower = 0.15;
@@ -69,7 +72,8 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
-        telemetry.log("Arm Power", isRamping);
+        telemetry.log("Arm Power", potentiometer.getVoltage());
+        telemetry.write();
         switch (currentState) {
             case RELEASE_PIN:
                 releaseArmPin();
@@ -189,5 +193,37 @@ public class ArmSystem extends System {
     public void setArmPin() {
         armRelease.setPosition(0.7);
         setState(ArmState.IDLE);
+    }
+
+    /**
+     * Gets the position of the potentiometer
+     * @return the potentiometer voltage
+     */
+    public ArmDirection getDirectionToRun(double voltage) {
+        return voltage >= potentiometer.getVoltage() ?
+                ArmDirection.DOWN :
+                ArmDirection.UP;
+    }
+
+    /**
+     * Checks if the arm is prepared to latch
+     * @return Returns true if the arm is prepared to latch
+     */
+    public boolean canLatch() {
+        return potentiometer.getVoltage() >= LatchPreparationVoltage - LatchPreparationMargin &&
+                potentiometer.getVoltage() <= LatchPreparationVoltage + LatchPreparationMargin;
+    }
+
+
+    /**
+     * Checks if the arm is collapsed and latched on the lander
+     * @return true if the arm is collapsed and latched on the lander
+     */
+    public boolean isLatched() {
+        return LatchVoltage >= potentiometer.getVoltage();
+    }
+
+    public boolean wheelsOnGround() {
+        return WheelVoltage <= potentiometer.getVoltage();
     }
 }

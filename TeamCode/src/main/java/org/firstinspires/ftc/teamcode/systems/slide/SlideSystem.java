@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
 public class SlideSystem extends System
 {
     private final double MaxWinchPower = 1;
-    private final int EncoderTop = 8730;
+    private final int EncoderTop = 8300;
 
     private DigitalChannel limitTop;
     private DigitalChannel limitMiddle;
@@ -45,13 +45,13 @@ public class SlideSystem extends System
         limitMiddle.setMode(DigitalChannel.Mode.INPUT);
 
         winchOrigin = winch.getCurrentPosition();
-        rampBottom = new LogarithmicRamp(
-                new Point(0.001,0),
+        rampTop = new LogarithmicRamp(
+                new Point(0.1,0),
                 new Point((winchOrigin + EncoderTop), MaxWinchPower)
         );
-        rampTop = new LogarithmicRamp(
+        rampBottom = new LogarithmicRamp(
                 new Point((winchOrigin + EncoderTop), MaxWinchPower),
-                new Point(0.0001, 0)
+                new Point(0.1, 0)
         );
     }
 
@@ -67,11 +67,6 @@ public class SlideSystem extends System
      * Runs the slide system
      */
     public void run() {
-        telemetry.log("Encoder", winch.getCurrentPosition());
-        telemetry.log("Top Power", rampTop.scaleX(winch.getCurrentPosition()));
-        telemetry.log("Bottom Power", rampBottom.scaleX(winch.getCurrentPosition()));
-        telemetry.log("Origin", winchOrigin);
-        telemetry.write();
         switch (state) {
             case WINCHING_TO_TOP:
                 slideUp();
@@ -107,7 +102,7 @@ public class SlideSystem extends System
      * @return Returns true if the slide is at the top
      */
     private boolean isAtTop() {
-        return false;//!limitTop.getState() && !limitMiddle.getState()
+        return winch.getCurrentPosition() >= winchOrigin + EncoderTop;
     }
 
     /**
