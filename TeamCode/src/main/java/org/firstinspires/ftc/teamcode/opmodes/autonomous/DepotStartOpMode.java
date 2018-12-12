@@ -27,11 +27,6 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
         waitForStart();
         ////
         // tensor flow
-        if (determineBlockPos() == 0) {
-            driveSystem.turn(20, autonoPower);
-        } else if (determineBlockPos() == 2) {
-            driveSystem.turn(-20, autonoPower);
-        }
         parkInDepot(autonoPower, colorSystem);
         markerSystem.reset();
         sleep(400);

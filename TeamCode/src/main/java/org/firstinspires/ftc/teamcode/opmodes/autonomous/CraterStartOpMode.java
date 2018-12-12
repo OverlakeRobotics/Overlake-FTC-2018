@@ -22,13 +22,22 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         ////
 
         // tensor flow
+        delatch();
+        sample();
         driveSystem.driveToPositionInches(backCubeIn, -autonoPower, false);
+
+        // either this code
         driveSystem.turnAbsolute(cratApproachDeg0, autonoPower);
         driveSystem.driveToPositionInches(cratTargDist3, -autonoPower, false);
         distanceSystem.strafeTowardWall(inFromWall, cratApproachDeg1, autonoPower);
+
+        // or this code
+        //distanceSystem.strafeTowardWallPolar(inFromWall, cratApproachDeg1, cratToWallHeading, autonoPower);
+
+
         parkInDepot(-autonoPower, colorSystem);
         markerSystem.place();
-        sleep(1000);
+        sleep(700);
         markerSystem.reset();
         driveSystem.driveToPositionInches(50, autonoPower, false);
         distanceSystem.strafeTowardWall(inFromWall, cratApproachDeg1, autonoPower);
@@ -39,3 +48,7 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         stop();
     }
 }
+
+// backCubeIn, cratTargDist3, inFromWall, toWallPow
+// cratApproachDeg0, cratApproachDeg1, cratToWallHeading
+// autonoPower, toWallPow
