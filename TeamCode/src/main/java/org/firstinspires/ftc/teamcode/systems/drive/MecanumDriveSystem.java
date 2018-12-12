@@ -75,10 +75,15 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
         leftX = scaleJoystickValue(leftX);
         leftY = scaleJoystickValue(leftY);
 
-        double frontRightPower = -leftY + leftX - rightX; // left stick up moves forward
+        /*double frontRightPower = -leftY + leftX - rightX; // left stick up moves forward
         double backRightPower = -leftY - leftX - rightX;
         double frontLeftPower = -leftY - leftX + rightX;
-        double backLeftPower = -leftY + leftX + rightX;
+        double backLeftPower = -leftY + leftX + rightX;*/
+
+        double frontRightPower = leftY + leftX - rightX; // left stick up moves forward
+        double backRightPower = -leftY + leftX - rightX;
+        double frontLeftPower = -leftY + leftX + rightX;
+        double backLeftPower = leftY + leftX + rightX;
 
         this.motorFrontRight.setPower(Range.clip(frontRightPower, -1, 1));
         this.motorBackRight.setPower(Range.clip(backRightPower, -1, 1));

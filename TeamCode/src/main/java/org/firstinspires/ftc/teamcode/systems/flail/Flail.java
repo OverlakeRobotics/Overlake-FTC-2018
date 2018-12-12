@@ -24,8 +24,12 @@ public class Flail extends System {
     /**
      * Starts the flail
      */
-    public void start() {
+    public void runForward() {
         flailMotor.setPower(-1);
+    }
+
+    public void runBackward() {
+        flailMotor.setPower(1);
     }
 
     /**

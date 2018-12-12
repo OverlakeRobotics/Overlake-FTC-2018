@@ -193,7 +193,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         if (!hasFoundGoldMineral(goldMineralX)) {
             turnAndSearch();
         } else if (hasFoundGoldMineral(goldMineralX)) {
-            handleGoldMineralWhenFound();
+            driveToGoldMineral();
         }
     }
 
@@ -214,12 +214,13 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         } else if (!doneSearching) {
             driveSystem.turn(-75, 1);
             doneSearching = true;
+            driveToGoldMineral();
         }
     }
 
-    private void handleGoldMineralWhenFound() {
+    private void driveToGoldMineral() {
         driveSystem.turn(-90, 1);
-        driveSystem.driveToPositionInches(32, 1);
+        driveSystem.driveToPositionInches(29, 1);
         hasDriven = true;
     }
 
