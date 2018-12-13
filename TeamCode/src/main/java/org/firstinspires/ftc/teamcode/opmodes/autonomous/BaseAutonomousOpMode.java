@@ -48,18 +48,28 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     public double initPitch;
     public double initRoll;
 
-    public int zone;
     public int backCubeIn; // the inches to back up after knocking the cube
     public int cratApproachDeg0; //the angle at which the robot approaches the wall after tensor flow
     public int cratApproachDeg1; // reletive to starting position
     public int approachDeg2;
+    public double cratToWallHeading;
     public double cratTargDist1;
-    public double powerToWall;
-    public double autonomousPower;
+    public int cratTargDist2;
+    public int cratTargDist3;
+    public int cratTargDist4;
 
-    public double CRITICAL_ANGLE = 0.75;
+    public int depDepappraochIn; // depot(OpMode) depot approach inches
+    public double depWallHeading;
+    public int depToCratIn;
+
+    public double toWallPow;
+    public double autonoPower;
+    public int inFromWall;
+    public int zone;
+
+    public double CRITICAL_ANGLE = 1.5;
     int RED_TRGGER_VALUE = 12;
-    int BLUE_TRIGGER_VALUE = 8;
+    int BLUE_TRIGGER_VALUE = 12;
 
     public BaseAutonomousOpMode(String opModeName)
     {
@@ -81,16 +91,24 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         markerSystem = new Marker(this);
         arm = new ArmSystem(this);
 
-        zone = config.getInt("zone");
         backCubeIn = config.getInt("backCubeIn");//10
 
         cratApproachDeg0 = config.getInt("cratApproachDeg0");//-90
         cratApproachDeg1 = config.getInt("cratApproachDeg1");//-120
+        cratToWallHeading = config.getDouble("cratToWallHeading");
         cratTargDist1 = config.getDouble("cratTargDist1");
+        cratTargDist2 = config.getInt("cratTargDist2");
+        cratTargDist3 = config.getInt("cratTargDist3");
+        cratTargDist4 = config.getInt("cratTargDist4");
 
+        depDepappraochIn = config.getInt("depDepApproachIn");
+        depWallHeading = config.getDouble("depWallHeading");
+        depToCratIn = config.getInt("depToCratIn");
 
-        powerToWall = config.getDouble("ToWallPow");
-        autonomousPower = config.getDouble("autonopower");
+        toWallPow = config.getDouble("ToWallPow");
+        autonoPower = config.getDouble("autonopower");
+        inFromWall = config.getInt("inFromWall");
+        zone = config.getInt("zone");
 
         initPitch = imuSystem.getPitch();
         initRoll = imuSystem.getRoll();
@@ -128,11 +146,11 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         arm.toggleRamping();
         arm.runMotors(ArmDirection.DOWN);
         arm.releaseArmPin();
-        sleep(1000);
+        sleep(750);
         arm.stop();
         sleep(1000);
-        driveSystem.mecanumDriveXY(0.3, 0);
-        sleep(750);
+        driveSystem.mecanumDriveXY(1, 0);
+        sleep(500);
         driveSystem.mecanumDriveXY(0, -0.3);
         sleep(500);
         driveSystem.mecanumDriveXY(-0.35,0.1);
@@ -220,7 +238,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 
     private void driveToGoldMineral() {
         driveSystem.turn(-90, 1);
-        driveSystem.driveToPositionInches(29, 1);
+        driveSystem.driveToPositionInches(32, 1);
         hasDriven = true;
     }
 

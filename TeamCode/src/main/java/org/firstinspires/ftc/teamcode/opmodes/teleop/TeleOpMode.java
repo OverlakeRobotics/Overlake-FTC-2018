@@ -161,6 +161,24 @@ public class TeleOpMode extends BaseOpMode
                 armSystem.setState(ArmState.RELEASE_PIN);
             }
         };
+        controller1.x.releasedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setState(ArmState.IDLE);
+            }
+        };
+        controller1.y.pressedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setArmPin();
+            }
+        };
+        controller1.y.releasedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setState(ArmState.IDLE);
+            }
+        };
         controller2.dPadDown.pressedHandler = new Handler()
         {
             @Override

@@ -13,17 +13,31 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
     @Override
     public void runOpMode() {
 
+        telem("About to initialize systems.", 0.25);
         this.initSystems();
+        telem("Initialized all systems. Ready." + ("" + distanceSystem), 0.25);
+
+        ////
         waitForStart();
+        ////
+        // tensor flow
         delatch();
         sample();
-        driveSystem.driveToPositionInches(50, -1);
-        driveSystem.turnAbsolute(cratApproachDeg1, autonomousPower);
-        parkInDepot(-autonomousPower, colorSystem);
+        driveSystem.driveToPositionInches(backCubeIn, -autonoPower, false);
+        // either this code
+        distanceSystem.strafeTowardWallPolar(inFromWall, cratApproachDeg1, cratToWallHeading, autonoPower);
+        parkInDepot(-autonoPower, colorSystem);
         markerSystem.place();
-        sleep(3000);
+        sleep(700);
         markerSystem.reset();
-        driveSystem.driveToPositionInches(100, 1);
+        driveSystem.driveToPositionInches(50, autonoPower, false);
+        distanceSystem.strafeTowardWall(inFromWall, cratApproachDeg1, autonoPower);
+        parkOnCrator(toWallPow, initPitch, initRoll);
+        markerSystem.reset();
         stop();
     }
 }
+
+// backCubeIn, cratTargDist3, inFromWall, toWallPow
+// cratApproachDeg0, cratApproachDeg1, cratToWallHeading
+// autonoPower, toWallPow
