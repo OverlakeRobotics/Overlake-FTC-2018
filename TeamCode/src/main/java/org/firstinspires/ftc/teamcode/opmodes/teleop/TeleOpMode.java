@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.controller.Controller;
 import org.firstinspires.ftc.teamcode.hardware.controller.Handler;
-import org.firstinspires.ftc.teamcode.opmodes.debuggers.TeleOpModeDebugger;
+import org.firstinspires.ftc.teamcode.opmodes.BaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmDirection;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmState;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
@@ -17,7 +18,8 @@ import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
  * Created by idiot on 10/11/17.
  */
 @TeleOp(name = "CompetitionTeleOp", group="TeleOp")
-public class TeleOpMode extends TeleOpModeDebugger {
+public class TeleOpMode extends BaseOpMode
+{
     private Controller controller1;
     private Controller controller2;
     private MecanumDriveSystem driveSystem;
@@ -41,20 +43,13 @@ public class TeleOpMode extends TeleOpModeDebugger {
         this.driveSystem = new MecanumDriveSystem(this);
         this.flail = new Flail(this);
         initButton();
-
         slowDrive = false;
-    }
-
-
-    @Override
-    public void initialize()
-    {
-
     }
 
     public void initButton() {
         telemetry.addData("buttons", "initialize");
         telemetry.update();
+        slideSystem.setOrigin(slideSystem.EncoderTop - slideSystem.getPosition());
         addWinchButton();
         addRotateButton();
         addFlailButton();
@@ -167,6 +162,24 @@ public class TeleOpMode extends TeleOpModeDebugger {
                 armSystem.setState(ArmState.RELEASE_PIN);
             }
         };
+        controller1.x.releasedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setState(ArmState.IDLE);
+            }
+        };
+        controller1.y.pressedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setArmPin();
+            }
+        };
+        controller1.y.releasedHandler = new Handler() {
+            @Override
+            public void invoke() throws Exception {
+                armSystem.setState(ArmState.IDLE);
+            }
+        };
         controller2.dPadDown.pressedHandler = new Handler()
         {
             @Override
@@ -259,7 +272,7 @@ public class TeleOpMode extends TeleOpModeDebugger {
     }
 
     @Override
-    public void run(){
+    public void loop(){
         controller1.handle();
         controller2.handle();
         armSystem.run();
@@ -281,9 +294,6 @@ public class TeleOpMode extends TeleOpModeDebugger {
             }
             armSystem.stop();
         } else {
-            driveSystem.mecanumDriveXY(0, 0.3);
-            sleep(500);
-            driveSystem.mecanumDriveXY(0, 0.5);
             while(!armSystem.isLatched()) {
                 if (armSystem.wheelsOnGround()) {
                     driveSystem.mecanumDriveXY(-0.5, 0);

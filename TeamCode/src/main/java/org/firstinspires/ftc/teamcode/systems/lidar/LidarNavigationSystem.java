@@ -11,9 +11,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.systems.System;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 
@@ -30,9 +31,9 @@ public class LidarNavigationSystem extends System {
     double initPitch;
     double initRoll;
 
-    public LidarNavigationSystem(OpMode opMode, MecanumDriveSystem driveSystem, ColorSystem colorSystem) {
+    public LidarNavigationSystem(IBaseOpMode opMode, MecanumDriveSystem driveSystem, ColorSystem colorSystem) {
         super(opMode, "DriveSystem4Wheel");
-        this.hwmap = opMode.hardwareMap;
+        this.hwmap = opMode.getHardwareMap();
         this.driveSystem = driveSystem;
         imu = new IMUSystem(opMode);
         this.colorSystem = colorSystem;
@@ -57,10 +58,9 @@ public class LidarNavigationSystem extends System {
     }
 
     public void telemetry() {
-        telemetry.log("range1", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
-        telemetry.log("range2", String.format("%.01f in", lidar2.getDistance(DistanceUnit.INCH)));
-        telemetry.log("frontRightDistance: ", "" + getFrontRightDistance());
-        telemetry.write();
+        log.info("range1", String.format("%.01f in", lidar.getDistance(DistanceUnit.INCH)));
+        log.info("range2", String.format("%.01f in", lidar2.getDistance(DistanceUnit.INCH)));
+        log.info("frontRightDistance: ", "" + getFrontRightDistance());
     }
 
     public double getFrontRightDistance() {
@@ -108,16 +108,14 @@ public class LidarNavigationSystem extends System {
             }
 
             double scaledPower = shouldRamp ? ramp.scaleX(distance) : power;
-            telemetry.log("LidarNavigationSystem",
+            log.info("LidarNavigationSystem",
                     "ticks left (ticks): " + driveSystem.getMinDistanceFromTarget());
-            telemetry.log("LidarNavigationSystem","scaled power: " + scaledPower);
-            telemetry.log("LidarNavigationSystem", "distance1: " + getDistance1());
-            telemetry.log("LidarNavigationSystem", "distance2: " + getDistance2());
+            log.info("LidarNavigationSystem","scaled power: " + scaledPower);
+            log.info("LidarNavigationSystem", "distance1: " + getDistance1());
+            log.info("LidarNavigationSystem", "distance2: " + getDistance2());
             driveSystem.setPower(direction * scaledPower);
-            telemetry.write();
         }
         driveSystem.setPower(0);
-        telemetry.write();
     }
 
     private void correctToFollowWall(double closeBuffer, double farBuffer, double correctionPower,
@@ -125,19 +123,18 @@ public class LidarNavigationSystem extends System {
         boolean isOutOfBounds = isOutOfBounds(closeBuffer, farBuffer);
         if (isOutOfBounds) {
             driveSystem.setPower(0);
-            telemetry.log("driveTest", "distance buffer triggered");
+            log.info("driveTest", "distance buffer triggered");
         }
         while (isOutOfBounds(closeBuffer, farBuffer)) {
-            telemetry.log("driveTest", "isOutOfBounds");
+            log.info("driveTest", "isOutOfBounds");
 
             double[] correctionPowers = getCorrectionTurnPower(closeBuffer, farBuffer, correctionPower);
             double leftPower = correctionPowers[0];
             double rightPower = correctionPowers[1];
 
             driveSystem.tankDrive(leftPower, rightPower);
-            telemetry.log("LidarNavigationSystem", "leftPower: " + leftPower);
-            telemetry.log("LidarNavigationSystem", "rightPower: " +  rightPower);
-            telemetry.write();
+            log.info("LidarNavigationSystem", "leftPower: " + leftPower);
+            log.info("LidarNavigationSystem", "rightPower: " +  rightPower);
         }
     }
 
@@ -160,13 +157,11 @@ public class LidarNavigationSystem extends System {
         while (!isOnCrater()) {
             correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.CRATOR);
 
-            telemetry.log("LidarNavigationSystem","scaled power: " + adjustedPower);
+            log.info("LidarNavigationSystem","scaled power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
-            telemetry.write();
         }
         driveSystem.setPower(0);
-        telemetry.log("LidarNavigationSystem","reached crator");
-        telemetry.write();
+        log.info("LidarNavigationSystem","reached crator");
     }
 
     public void driveAlongWallToDepot(double closeBuffer, double farBuffer, double power) {
@@ -181,13 +176,11 @@ public class LidarNavigationSystem extends System {
         while (!isInDepot()) {
             correctToFollowWall(closeBuffer, farBuffer, power, StopCondition.CRATOR);
 
-            telemetry.log("LidarNavigationSystem","scaled power: " + adjustedPower);
+            log.info("LidarNavigationSystem","scaled power: " + adjustedPower);
             driveSystem.setPower(adjustedPower);
-            telemetry.write();
         }
         driveSystem.setPower(0);
-        telemetry.log("LidarNavigationSystem","reached depot");
-        telemetry.write();
+        log.info("LidarNavigationSystem","reached depot");
     }
 
     public void getCloseToWall(double targetDistanceFromWall, double power) {
@@ -195,9 +188,8 @@ public class LidarNavigationSystem extends System {
 
         while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
             driveSystem.setPower(power);
-            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
-            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
-            telemetry.write();
+            log.info("LidarNavigationSystem", "distance 1: " + getDistance1());
+            log.info("LidarNavigationSystem", "distance 2: " + getDistance2());
         }
         driveSystem.setPower(0);
     }
@@ -211,9 +203,9 @@ public class LidarNavigationSystem extends System {
 
         while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
             driveSystem.mecanumDrivePolar(driveHeading, power);
-            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
-            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
-            telemetry.write();
+//            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
+//            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
+//            telemetry.write();
         }
         driveSystem.setPower(0);
     }
@@ -225,9 +217,9 @@ public class LidarNavigationSystem extends System {
 
         while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
             driveSystem.setPower(power);
-            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
-            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
-            telemetry.write();
+//            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
+//            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
+//            telemetry.write();
         }
         driveSystem.setPower(0);
     }
@@ -240,28 +232,28 @@ public class LidarNavigationSystem extends System {
         if ((((getDistance1() >= farBuffer) || getDistance2() <= closeBuffer) && !(getDistance2() >= farBuffer)) ||
                 ((getDistance1() <= farBuffer) && (getDistance2() <= farBuffer))) {
             if (power > 0) {
-                telemetry.log("driveTest", "turning RIGHT");
+//                telemetry.log("driveTest", "turning RIGHT");
                 rightPower = lowPoweredSideTurnPower;
                 leftPower = highPoweredSideturnPower;
             } else {
-                telemetry.log("driveTest", "turning LEFT");
+//                telemetry.log("driveTest", "turning LEFT");
                 rightPower = highPoweredSideturnPower;
                 leftPower = lowPoweredSideTurnPower;
             }
         } else if ((((getDistance2() >= farBuffer) || (getDistance1() <= closeBuffer))) ||
                 ((getDistance1() >= farBuffer) && (getDistance2() >= farBuffer))) {
             if (power > 0) {
-                telemetry.log("driveTest", "turning LEFT");
+//                telemetry.log("driveTest", "turning LEFT");
                 rightPower = highPoweredSideturnPower;
                 leftPower = lowPoweredSideTurnPower;
             } else {
-                telemetry.log("driveTest", "turning RIGHT");
+//                telemetry.log("driveTest", "turning RIGHT");
                 rightPower = lowPoweredSideTurnPower;
                 leftPower = highPoweredSideturnPower;
             }
         }
         double[] powers = new double[] {leftPower, rightPower};
-        telemetry.write();
+//        telemetry.write();
         return powers;
     }
 
@@ -288,11 +280,9 @@ public class LidarNavigationSystem extends System {
 
         while (Math.abs(getDistance1() - getDistance2()) > 0.05) {
             double power = driveSystem.getTurnPower(ramp, getDistance2(), getDistance1());
-            telemetry.log("MecanumDriveSystem","heading: " + (getDistance2() - getDistance1()));
-            telemetry.log("MecanumDriveSystem","power: " + power);
-            telemetry.write();
-
-
+//            telemetry.log("MecanumDriveSystem","heading: " + (getDistance2() - getDistance1()));
+//            telemetry.log("MecanumDriveSystem","power: " + power);
+//            telemetry.write();
             driveSystem.tankDrive(power, -power);
         }
         driveSystem.setPower(0);

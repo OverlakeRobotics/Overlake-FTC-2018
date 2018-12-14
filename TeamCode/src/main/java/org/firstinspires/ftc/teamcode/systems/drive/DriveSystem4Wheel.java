@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.systems.drive;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * A class to handle our four motor Drive Systems
@@ -22,7 +22,7 @@ public abstract class DriveSystem4Wheel extends System
      * Handles the data for the abstract creation of a drive system with four wheels
      * @param opMode opmode this system runs in
      */
-    public DriveSystem4Wheel(OpMode opMode) {
+    public DriveSystem4Wheel(IBaseOpMode opMode) {
         super(opMode, "DriveSystem4Wheel");
 
         this.motorFrontLeft = hardwareMap.dcMotor.get("motorFL");

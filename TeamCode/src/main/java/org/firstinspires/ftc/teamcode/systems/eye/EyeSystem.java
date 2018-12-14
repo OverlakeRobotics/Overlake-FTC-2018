@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.systems.base;
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+package org.firstinspires.ftc.teamcode.systems.eye;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -10,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-public class EyeSystem extends System {
+public class EyeSystem extends System
+{
 
     private final String LICENSE_KEY = "AfIW5rj/////AAAAGaDrYjvjtkibrSYzQTjEFjJb+NGdODG1LJE2IVqxl0wdLW+9JZ3nIyQF2Hef7GlSLQxR/6SQ3pkFudWmzU48zdcBEYJ+HCwOH3vKFK8gJjuzrcc7nis7JrU+IMTONPctq+JTavtRk+LBhM5bxiFJhEO7CFnDqDDEFc5f720179XJOvZZA0nuCvIqwSslb+ybEVo/G8BDwH1FjGOaH/CxWaXGxVmGd4zISFBsMyrwopDI2T0pHdqvRBQ795QCuJFQjGQUtk9UU3hw/E8Z+oSC36CSWZPdpH3XkKtvSb9teM5xgomeEJ17MdV+XwTYL0iB/aRXZiXRczAtjrcederMUrNqqS0o7XvYS3eW1ViHfynl";
 
@@ -40,7 +41,7 @@ public class EyeSystem extends System {
     Orientation rotation;
     VectorF translation;
 
-    public EyeSystem(OpMode opMode) {
+    public EyeSystem(IBaseOpMode opMode) {
         super(opMode, "EyeSystem");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -70,14 +71,13 @@ public class EyeSystem extends System {
     public void find(int seconds) {
         long startTime = java.lang.System.currentTimeMillis();
         while (((java.lang.System.currentTimeMillis() - startTime) / 1000) <= seconds) {
-            telemetry.log("Eye","startTime: " + startTime);
-            telemetry.log("Eye","currentTime: " + ((java.lang.System.currentTimeMillis() - startTime) / 1000));
+            log.info("Eye","startTime: " + startTime);
+            log.info("Eye","currentTime: " + ((java.lang.System.currentTimeMillis() - startTime) / 1000));
             if (rotation == null) {
                 look();
             } else {
                 return;
             }
-            telemetry.write();
         }
     }
 
@@ -86,7 +86,7 @@ public class EyeSystem extends System {
         targetVisible = false;
         for (VuforiaTrackable trackable : allTrackables) {
             if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                telemetry.log("Eye","Visible Target", trackable.getName());
+                log.info("Eye","Visible Target", trackable.getName());
                 targetVisible = true;
 
                 // getUpdatedRobotLocation() will return null if no new information is available since
@@ -103,15 +103,14 @@ public class EyeSystem extends System {
         if (targetVisible) {
             // express position (translation) of robot in inches.
             translation = lastLocation.getTranslation();
-            telemetry.log("Eye","Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+            log.info("Eye","Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                     translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
             rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            telemetry.log("Eye","Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+            log.info("Eye","Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
         }
         else {
-            telemetry.log("Eye","Visible Target", "none");
+            log.info("Eye","Visible Target", "none");
         }
-        telemetry.write();
     }
 
     public double getRoll() {

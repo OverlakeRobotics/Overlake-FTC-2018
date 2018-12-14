@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.components.configs.ConfigParser;
+import org.firstinspires.ftc.teamcode.opmodes.BaseLinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmDirection;
 import org.firstinspires.ftc.teamcode.systems.arm.ArmSystem;
 import org.firstinspires.ftc.teamcode.systems.color.ColorSystem;
@@ -13,6 +16,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 import org.firstinspires.ftc.teamcode.systems.marker.Marker;
+import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
 import java.util.List;
@@ -21,7 +25,7 @@ import java.util.List;
  * Created by EvanCoulson on 10/11/17.
  */
 
-public abstract class BaseAutonomousOpMode extends LinearOpMode
+public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -35,6 +39,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     private boolean hasDriven;
     private boolean hasTurned;
     private boolean doneSearching;
+    private ElapsedTime time;
 
     ConfigParser config;
     public MecanumDriveSystem driveSystem;
@@ -43,6 +48,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public LidarNavigationSystem distanceSystem;
     public Marker markerSystem;
     public ArmSystem arm;
+    public SlideSystem slideSystem;
 
     public double initPitch;
     public double initRoll;
@@ -86,6 +92,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         hasTurned = false;
         doneSearching = false;
         this.driveSystem = new MecanumDriveSystem(this);
+        this.slideSystem = new SlideSystem(this);
         this.imuSystem = new IMUSystem(this);
         colorSystem = new ColorSystem(this);
         distanceSystem = new LidarNavigationSystem(this, driveSystem, colorSystem);
@@ -130,6 +137,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
 
     public void parkOnCrator(double maxPower, double initPitch, double initRoll) {
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         driveSystem.setPower(maxPower);
 
         while (((Math.abs(imuSystem.getPitch() - initPitch) < CRITICAL_ANGLE) ||
@@ -149,36 +157,35 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         arm.toggleRamping();
         arm.runMotors(ArmDirection.DOWN);
         arm.releaseArmPin();
-        sleep(1000);
+        sleep(500);
         arm.stop();
         sleep(1000);
-        driveSystem.mecanumDriveXY(0.3, 0);
-        sleep(750);
+        driveSystem.mecanumDriveXY(1, 0);
+        sleep(250);
         driveSystem.mecanumDriveXY(0, -0.3);
         sleep(500);
-        driveSystem.mecanumDriveXY(-0.35,0.1);
-        arm.toggleRamping();
-        arm.runMotors(ArmDirection.DOWN);
+        driveSystem.mecanumDriveXY(-0.425,0.1);
+        collapse();
         sleep(500);
         arm.stop();
         driveSystem.mecanumDriveXY(0,0);
     }
 
+    public void collapse() {
+        while (!arm.isCollapsed()) {
+            arm.runMotors(ArmDirection.DOWN);
+        }
+        arm.stop();
+    }
+
     public void sample() {
+        driveSystem.driveToPositionInches(2, 1);
         driveSystem.mecanumDriveXY(-0.3, 0);
         sleep(700);
         driveSystem.mecanumDriveXY(0,0);
-        driveSystem.driveToPositionInches(5, 0.7);
         tensorFlow.activate();
         lookForGoldMineral();
         driveSystem.driveToPositionInches(18, -1);
-        if (doneSearching) {
-            driveSystem.turn(125, 1);
-        } else if (hasTurned) {
-            driveSystem.turn(60, 1);
-        } else {
-            driveSystem.turn(95, 1);
-        }
         tensorFlow.shutDown();
     }
 
@@ -193,6 +200,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     }
 
     private void lookForGoldMineral() {
+        time = new ElapsedTime();
         while (shouldLookForGoldMineral()) {
             List<Recognition> updatedRecognitions = tensorFlow.getUpdatedRecognitions();
             if (shouldHandleUpdatedRecognitions(updatedRecognitions)) {
@@ -231,7 +239,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     private void turnAndSearch() {
         if (!hasTurned) {
             hasTurned = true;
-            driveSystem.turn(35, 1);
+            driveSystem.turn(33, 1);
         } else if (!doneSearching) {
             driveSystem.turn(-75, 1);
             doneSearching = true;
@@ -241,7 +249,7 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
 
     private void driveToGoldMineral() {
         driveSystem.turn(-90, 1);
-        driveSystem.driveToPositionInches(29, 1);
+        driveSystem.driveToPositionInches(32, 1);
         hasDriven = true;
     }
 
@@ -249,18 +257,18 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         return  goldMineralX != -1;
     }
 
-    public int getCubePosition() {
-        int pos = 0;
-        if (((imuSystem.getHeading() - driveSystem.initialHeading) > -100) &&
-                ((imuSystem.getHeading() - driveSystem.initialHeading) <= -80)) {
-            pos = 1;
-        } else if ((imuSystem.getHeading() - driveSystem.initialHeading) < -100) {
-            pos = 0;
-        } else if ((imuSystem.getHeading() - driveSystem.initialHeading) >= -80) {
-            pos = 2;
+    public void runSlideOut() {
+        while(!slideSystem.isAtTop()) {
+            slideSystem.slideUp();
         }
-        telemetry.addLine( "cubePos: " + pos);
-        telemetry.update();
-        return pos;
+        slideSystem.stop();
+    }
+
+    private boolean isOutOfTime() {
+        boolean isOutOfTime = time.seconds() > 2;
+        if (time.seconds() > 2) {
+            time = new ElapsedTime();
+        }
+        return isOutOfTime;
     }
 }

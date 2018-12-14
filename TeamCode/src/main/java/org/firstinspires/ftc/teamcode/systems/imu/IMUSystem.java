@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.systems.imu;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -10,7 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 import java.util.Locale;
 
@@ -21,7 +21,7 @@ public class IMUSystem extends System {
     public BNO055IMU imu;
     public BNO055IMU.Parameters parameters;
 
-    // State used for updating telemetry
+    // State used for updating log
     private Orientation angles;
     private Acceleration gravity;
 
@@ -29,7 +29,7 @@ public class IMUSystem extends System {
      * Creates a new IMU System
      * @param opMode the opmode the system is running in
      */
-    public IMUSystem(OpMode opMode)
+    public IMUSystem(IBaseOpMode opMode)
     {
         super(opMode, "IMUSystem");
 

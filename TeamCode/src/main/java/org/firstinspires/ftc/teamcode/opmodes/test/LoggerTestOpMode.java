@@ -1,41 +1,23 @@
 package org.firstinspires.ftc.teamcode.opmodes.test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.opmodes.debuggers.LinearOpModeDebugger;
-import org.firstinspires.ftc.teamcode.systems.logging.ILogger;
-import org.firstinspires.ftc.teamcode.systems.logging.PhoneLogger;
+import org.firstinspires.ftc.teamcode.systems.logging.RobotHubLogger;
 
 import java.util.Scanner;
 
 @Autonomous(name = "LoggingTestOpMode")
-public class LoggerTestOpMode extends LinearOpModeDebugger
+public class LoggerTestOpMode extends LinearOpMode
 {
     @Override
-    public void run()
+    public void runOpMode() throws InterruptedException
     {
-        ILogger logger = new PhoneLogger(telemetry);
-        logger.log("1", "1");
-        logger.write();
-        sleepThread(1000);
-        logger.log("1", "2");
-        logger.log("2", "1");
-        logger.write();
-        sleepThread(1000);
-        logger.log("1", "3");
-        logger.log("2", "2");
-        logger.write();
-        sleepThread(1000);
-    }
-
-    private void sleepThread(int miliseconds) {
-        try
-        {
-            Thread.sleep(miliseconds);
-        }
-        catch (InterruptedException e)
-        {
-            throw new IllegalStateException("Failed to sleep thread", e);
-        }
+        RobotHubLogger logger = new RobotHubLogger();
+        waitForStart();
+        logger.info("Arm System", "Hello world!");
+        logger.error("Arm System", "Total failure");
+        logger.close();
     }
 }

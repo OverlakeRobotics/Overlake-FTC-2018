@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems.color;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 
 
@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
 
         private ColorSensor colorSensor;
 
-        public ColorSystem(OpMode opMode) {
+        public ColorSystem(IBaseOpMode opMode) {
             super(opMode, "ColorSystem");
 
             colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
@@ -19,11 +19,10 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
         }
 
         public void telemetry() {
-            telemetry.log("Alpha", colorSensor.alpha());
-            telemetry.log("Red  ", colorSensor.red());
-            telemetry.log("Green", colorSensor.green());
-            telemetry.log("Blue ", colorSensor.blue());
-            telemetry.write();
+            log.info("Alpha", colorSensor.alpha());
+            log.info("Red  ", colorSensor.red());
+            log.info("Green", colorSensor.green());
+            log.info("Blue ", colorSensor.blue());
         }
 
         public int getRed() {

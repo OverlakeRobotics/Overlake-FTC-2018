@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems.flail;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * Flail system runs a flail and stops a flail
@@ -15,7 +15,7 @@ public class Flail extends System {
      * Creates a new flail object in the current opmode
      * @param opMode uses the current opmode to build a new flail
      */
-    public Flail(OpMode opMode) {
+    public Flail(IBaseOpMode opMode) {
         super (opMode,"flail");
         flailMotor = hardwareMap.dcMotor.get("flail");
     }

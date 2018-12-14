@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.systems.marker;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * Runs a servo to release a marker attached to the side of the robot.
@@ -16,7 +16,7 @@ public class Marker extends System {
      * that runs in the current opmode
      * @param opMode
      */
-    public Marker(OpMode opMode) {
+    public Marker(IBaseOpMode opMode) {
         super(opMode, "marker");
         this.servo = hardwareMap.servo.get("marker");
     }

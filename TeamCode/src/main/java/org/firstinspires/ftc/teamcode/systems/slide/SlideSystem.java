@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.systems.slide;
 
-import android.transition.Slide;
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
-import org.firstinspires.ftc.teamcode.components.scale.ExponentialRamp;
 import org.firstinspires.ftc.teamcode.components.scale.LogarithmicRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * Runs a linear slide system on the robot
@@ -18,7 +15,7 @@ import org.firstinspires.ftc.teamcode.systems.base.System;
 public class SlideSystem extends System
 {
     private final double MaxWinchPower = 1;
-    private final int EncoderTop = 8300;
+    public final int EncoderTop = 8300;
 
     private DigitalChannel limitTop;
     private DigitalChannel limitMiddle;
@@ -33,7 +30,7 @@ public class SlideSystem extends System
      * Creates a new linear slide system in the current opmode
      * @param opMode current opmode being executed
      */
-    public SlideSystem(OpMode opMode)
+    public SlideSystem(IBaseOpMode opMode)
     {
         super(opMode, "SlideSystem");
         winch = hardwareMap.dcMotor.get("winch");
@@ -101,7 +98,7 @@ public class SlideSystem extends System
      * Checks if the slide is at the top
      * @return Returns true if the slide is at the top
      */
-    private boolean isAtTop() {
+    public boolean isAtTop() {
         return winch.getCurrentPosition() >= winchOrigin + EncoderTop;
     }
 
@@ -136,5 +133,19 @@ public class SlideSystem extends System
     public void stop() {
         setState(SlideState.IDLE);
         winch.setPower(0);
+    }
+
+    /**
+     * Sets the origin of the slide system
+     */
+    public void setOrigin(int origin) {
+        this.winchOrigin = origin;
+    }
+
+    /**
+     * Gets the position of the slide
+     */
+    public int getPosition() {
+        return winch.getCurrentPosition();
     }
 }

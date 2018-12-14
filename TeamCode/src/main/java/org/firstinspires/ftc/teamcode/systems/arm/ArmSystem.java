@@ -3,13 +3,13 @@ package org.firstinspires.ftc.teamcode.systems.arm;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.components.scale.LogarithmicRamp;
 import org.firstinspires.ftc.teamcode.components.scale.Point;
 import org.firstinspires.ftc.teamcode.components.scale.Ramp;
-import org.firstinspires.ftc.teamcode.systems.base.System;
+import org.firstinspires.ftc.teamcode.opmodes.IBaseOpMode;
+import org.firstinspires.ftc.teamcode.systems.System;
 
 /**
  * Arm System rotates the arm up and down through angular motion. The arm moves using a potentiometer
@@ -42,7 +42,7 @@ public class ArmSystem extends System {
      * Builds a new Arm System for the given opmode
      * @param opMode the opmode that the arm system is currently running on
      */
-    public ArmSystem(OpMode opMode) {
+    public ArmSystem(IBaseOpMode opMode) {
         super(opMode, "ArmSystem");
         motor1 = hardwareMap.dcMotor.get("parallelM1");
         motor2 = hardwareMap.dcMotor.get("parallelM2");
@@ -72,8 +72,6 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
-        telemetry.log("Arm Power", potentiometer.getVoltage());
-        telemetry.write();
         switch (currentState) {
             case RELEASE_PIN:
                 releaseArmPin();
@@ -221,6 +219,10 @@ public class ArmSystem extends System {
      */
     public boolean isLatched() {
         return LatchVoltage >= potentiometer.getVoltage();
+    }
+
+    public boolean isCollapsed() {
+        return 1.6 >= potentiometer.getVoltage();
     }
 
     public boolean wheelsOnGround() {
