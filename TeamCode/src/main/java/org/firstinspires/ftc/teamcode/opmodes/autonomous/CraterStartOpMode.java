@@ -22,7 +22,7 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         markerSystem.place();
         sleep(700);
         markerSystem.reset();
-        driveSystem.driveToPositionInches(75, autonoPower, false);
+        driveSystem.driveToPositionInches(70, autonoPower, false);
         driveSystem.turnAbsolute(42, 1);
         runSlideOut();
     }

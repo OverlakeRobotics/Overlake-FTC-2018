@@ -175,6 +175,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     }
 
     public void sample() {
+        driveSystem.driveToPositionInches(2, 1);
         driveSystem.mecanumDriveXY(-0.3, 0);
         sleep(700);
         driveSystem.mecanumDriveXY(0,0);
@@ -214,7 +215,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 
     private void handleUpdatedRecognitions(List<Recognition> updatedRecognitions) {
         int goldMineralX = getGoldMineralX(updatedRecognitions);
-        if (!hasFoundGoldMineral(goldMineralX) || isOutOfTime()) {
+        if (!hasFoundGoldMineral(goldMineralX)) {
             turnAndSearch();
         } else if (hasFoundGoldMineral(goldMineralX)) {
             driveToGoldMineral();
@@ -234,9 +235,9 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     private void turnAndSearch() {
         if (!hasTurned) {
             hasTurned = true;
-            driveSystem.turn(34, 1);
+            driveSystem.turn(33, 1);
         } else if (!doneSearching) {
-            driveSystem.turn(-45, 1);
+            driveSystem.turn(-75, 1);
             doneSearching = true;
             driveToGoldMineral();
         }

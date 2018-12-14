@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.systems.System;
 public class SlideSystem extends System
 {
     private final double MaxWinchPower = 1;
-    private final int EncoderTop = 8300;
+    public final int EncoderTop = 8300;
 
     private DigitalChannel limitTop;
     private DigitalChannel limitMiddle;
@@ -133,5 +133,19 @@ public class SlideSystem extends System
     public void stop() {
         setState(SlideState.IDLE);
         winch.setPower(0);
+    }
+
+    /**
+     * Sets the origin of the slide system
+     */
+    public void setOrigin(int origin) {
+        this.winchOrigin = origin;
+    }
+
+    /**
+     * Gets the position of the slide
+     */
+    public int getPosition() {
+        return winch.getCurrentPosition();
     }
 }

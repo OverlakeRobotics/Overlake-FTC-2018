@@ -49,6 +49,7 @@ public class TeleOpMode extends BaseOpMode
     public void initButton() {
         telemetry.addData("buttons", "initialize");
         telemetry.update();
+        slideSystem.setOrigin(slideSystem.EncoderTop - slideSystem.getPosition());
         addWinchButton();
         addRotateButton();
         addFlailButton();
