@@ -293,9 +293,6 @@ public class TeleOpMode extends BaseOpMode
             }
             armSystem.stop();
         } else {
-            driveSystem.mecanumDriveXY(0, 0.3);
-            sleep(500);
-            driveSystem.mecanumDriveXY(0, 0.5);
             while(!armSystem.isLatched()) {
                 if (armSystem.wheelsOnGround()) {
                     driveSystem.mecanumDriveXY(-0.5, 0);

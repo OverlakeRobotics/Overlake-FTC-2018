@@ -72,8 +72,6 @@ public class ArmSystem extends System {
      * Runs the arm
      */
     public void run() {
-        log.info("Arm Power", isRamping);
-        log.info("Arm Power", potentiometer.getVoltage());
         switch (currentState) {
             case RELEASE_PIN:
                 releaseArmPin();
@@ -221,6 +219,10 @@ public class ArmSystem extends System {
      */
     public boolean isLatched() {
         return LatchVoltage >= potentiometer.getVoltage();
+    }
+
+    public boolean isCollapsed() {
+        return 1.6 >= potentiometer.getVoltage();
     }
 
     public boolean wheelsOnGround() {

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -14,6 +16,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 import org.firstinspires.ftc.teamcode.systems.imu.IMUSystem;
 import org.firstinspires.ftc.teamcode.systems.marker.Marker;
+import org.firstinspires.ftc.teamcode.systems.slide.SlideSystem;
 import org.firstinspires.ftc.teamcode.systems.tensorflow.TensorFlow;
 
 import java.util.List;
@@ -36,6 +39,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     private boolean hasDriven;
     private boolean hasTurned;
     private boolean doneSearching;
+    private ElapsedTime time;
 
     ConfigParser config;
     public MecanumDriveSystem driveSystem;
@@ -44,6 +48,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     public LidarNavigationSystem distanceSystem;
     public Marker markerSystem;
     public ArmSystem arm;
+    public SlideSystem slideSystem;
 
     public double initPitch;
     public double initRoll;
@@ -85,6 +90,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         hasTurned = false;
         doneSearching = false;
         this.driveSystem = new MecanumDriveSystem(this);
+        this.slideSystem = new SlideSystem(this);
         this.imuSystem = new IMUSystem(this);
         colorSystem = new ColorSystem(this);
         distanceSystem = new LidarNavigationSystem(this, driveSystem, colorSystem);
@@ -127,6 +133,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 
     public void parkOnCrator(double maxPower, double initPitch, double initRoll) {
         driveSystem.setDirection(DriveSystem4Wheel.DriveDirection.FORWARD);
+        driveSystem.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         driveSystem.setPower(maxPower);
 
         while (((Math.abs(imuSystem.getPitch() - initPitch) < CRITICAL_ANGLE) ||
@@ -146,36 +153,34 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         arm.toggleRamping();
         arm.runMotors(ArmDirection.DOWN);
         arm.releaseArmPin();
-        sleep(750);
+        sleep(500);
         arm.stop();
         sleep(1000);
         driveSystem.mecanumDriveXY(1, 0);
-        sleep(500);
+        sleep(250);
         driveSystem.mecanumDriveXY(0, -0.3);
         sleep(500);
-        driveSystem.mecanumDriveXY(-0.35,0.1);
-        arm.toggleRamping();
-        arm.runMotors(ArmDirection.DOWN);
+        driveSystem.mecanumDriveXY(-0.425,0.1);
+        collapse();
         sleep(500);
         arm.stop();
         driveSystem.mecanumDriveXY(0,0);
+    }
+
+    public void collapse() {
+        while (!arm.isCollapsed()) {
+            arm.runMotors(ArmDirection.DOWN);
+        }
+        arm.stop();
     }
 
     public void sample() {
         driveSystem.mecanumDriveXY(-0.3, 0);
         sleep(700);
         driveSystem.mecanumDriveXY(0,0);
-        driveSystem.driveToPositionInches(5, 0.7);
         tensorFlow.activate();
         lookForGoldMineral();
         driveSystem.driveToPositionInches(18, -1);
-        if (doneSearching) {
-            driveSystem.turn(125, 1);
-        } else if (hasTurned) {
-            driveSystem.turn(60, 1);
-        } else {
-            driveSystem.turn(95, 1);
-        }
         tensorFlow.shutDown();
     }
 
@@ -190,6 +195,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     }
 
     private void lookForGoldMineral() {
+        time = new ElapsedTime();
         while (shouldLookForGoldMineral()) {
             List<Recognition> updatedRecognitions = tensorFlow.getUpdatedRecognitions();
             if (shouldHandleUpdatedRecognitions(updatedRecognitions)) {
@@ -208,7 +214,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 
     private void handleUpdatedRecognitions(List<Recognition> updatedRecognitions) {
         int goldMineralX = getGoldMineralX(updatedRecognitions);
-        if (!hasFoundGoldMineral(goldMineralX)) {
+        if (!hasFoundGoldMineral(goldMineralX) || isOutOfTime()) {
             turnAndSearch();
         } else if (hasFoundGoldMineral(goldMineralX)) {
             driveToGoldMineral();
@@ -228,9 +234,9 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     private void turnAndSearch() {
         if (!hasTurned) {
             hasTurned = true;
-            driveSystem.turn(35, 1);
+            driveSystem.turn(34, 1);
         } else if (!doneSearching) {
-            driveSystem.turn(-75, 1);
+            driveSystem.turn(-45, 1);
             doneSearching = true;
             driveToGoldMineral();
         }
@@ -244,5 +250,20 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 
     private boolean hasFoundGoldMineral(int goldMineralX) {
         return  goldMineralX != -1;
+    }
+
+    public void runSlideOut() {
+        while(!slideSystem.isAtTop()) {
+            slideSystem.slideUp();
+        }
+        slideSystem.stop();
+    }
+
+    private boolean isOutOfTime() {
+        boolean isOutOfTime = time.seconds() > 2;
+        if (time.seconds() > 2) {
+            time = new ElapsedTime();
+        }
+        return isOutOfTime;
     }
 }

@@ -64,10 +64,6 @@ public class SlideSystem extends System
      * Runs the slide system
      */
     public void run() {
-        log.info("Encoder", winch.getCurrentPosition());
-        log.info("Top Power", rampTop.scaleX(winch.getCurrentPosition()));
-        log.info("Bottom Power", rampBottom.scaleX(winch.getCurrentPosition()));
-        log.info("Origin", winchOrigin);
         switch (state) {
             case WINCHING_TO_TOP:
                 slideUp();
@@ -102,7 +98,7 @@ public class SlideSystem extends System
      * Checks if the slide is at the top
      * @return Returns true if the slide is at the top
      */
-    private boolean isAtTop() {
+    public boolean isAtTop() {
         return winch.getCurrentPosition() >= winchOrigin + EncoderTop;
     }
 
