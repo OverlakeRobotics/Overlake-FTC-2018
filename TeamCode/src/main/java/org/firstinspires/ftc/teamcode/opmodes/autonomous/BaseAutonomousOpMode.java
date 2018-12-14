@@ -60,6 +60,8 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
     public int depDepappraochIn; // depot(OpMode) depot approach inches
     public double depWallHeading;
     public int depToCratIn;
+    public double depApproachDeg0; // 45
+    public double depToWallHeading; // 160
 
     public double toWallPow;
     public double autonoPower;
@@ -103,6 +105,8 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
         depDepappraochIn = config.getInt("depDepApproachIn");
         depWallHeading = config.getDouble("depWallHeading");
         depToCratIn = config.getInt("depToCratIn");
+        depApproachDeg0 = config.getDouble("depApproachDeg0");
+        depToWallHeading = config.getDouble("depToWallHeading");
 
         toWallPow = config.getDouble("ToWallPow");
         autonoPower = config.getDouble("autonopower");
@@ -243,5 +247,20 @@ public abstract class BaseAutonomousOpMode extends LinearOpMode
 
     private boolean hasFoundGoldMineral(int goldMineralX) {
         return  goldMineralX != -1;
+    }
+
+    public int getCubePosition() {
+        int pos = 0;
+        if (((imuSystem.getHeading() - driveSystem.initialHeading) > -100) &&
+                ((imuSystem.getHeading() - driveSystem.initialHeading) <= -80)) {
+            pos = 1;
+        } else if ((imuSystem.getHeading() - driveSystem.initialHeading) < -100) {
+            pos = 0;
+        } else if ((imuSystem.getHeading() - driveSystem.initialHeading) >= -80) {
+            pos = 2;
+        }
+        telemetry.addLine( "cubePos: " + pos);
+        telemetry.update();
+        return pos;
     }
 }

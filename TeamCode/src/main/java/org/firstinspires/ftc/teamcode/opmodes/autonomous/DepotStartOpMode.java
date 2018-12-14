@@ -27,6 +27,13 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
         waitForStart();
         ////
         // tensor flow
+
+        delatch();
+        sample();
+        distanceSystem.strafeTowardWallPolar(inFromWall, depApproachDeg0, depToWallHeading, autonoPower);
+
+
+
         parkInDepot(autonoPower, colorSystem);
         markerSystem.reset();
         sleep(400);

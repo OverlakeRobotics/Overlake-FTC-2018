@@ -27,12 +27,12 @@ public class CraterStartOpMode extends BaseAutonomousOpMode {
         driveSystem.driveToPositionInches(backCubeIn, -autonoPower, false);
 
         // either this code
-        driveSystem.turnAbsolute(cratApproachDeg0, autonoPower);
-        driveSystem.driveToPositionInches(cratTargDist3, -autonoPower, false);
-        distanceSystem.strafeTowardWall(inFromWall, cratApproachDeg1, autonoPower);
+        //driveSystem.turnAbsolute(cratApproachDeg0, autonoPower);
+        //driveSystem.driveToPositionInches(cratTargDist3, -autonoPower, false);
+        //distanceSystem.strafeTowardWall(inFromWall, cratApproachDeg1, autonoPower);
 
         // or this code
-        //distanceSystem.strafeTowardWallPolar(inFromWall, cratApproachDeg1, cratToWallHeading, autonoPower);
+        distanceSystem.strafeTowardWallPolar(inFromWall, cratApproachDeg1, cratToWallHeading, autonoPower);
 
 
         parkInDepot(-autonoPower, colorSystem);
