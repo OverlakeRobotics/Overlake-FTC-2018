@@ -2,16 +2,12 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "CraterStartOpMode", group = "Bot")
+@Autonomous(name = "Crater Start", group = "Competition")
 public class CraterStartOpMode extends BaseAutonomousOpMode {
     private final String TAG = "CraterStartOpMode";
 
-    public CraterStartOpMode () {
-        super("CraterStartOpMode");
-    }
-
     @Override
-    public void runOpMode() {
+    public void run() {
         this.initSystems();
         waitForStart();
         delatch();

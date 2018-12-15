@@ -21,4 +21,11 @@ public abstract class BaseLinearOpMode extends LinearOpMode implements IBaseOpMo
     public HardwareMap getHardwareMap() {
         return this.hardwareMap;
     }
+
+    public void runOpMode() {
+        run();
+        logger.close();
+    }
+
+    public abstract void run();
 }

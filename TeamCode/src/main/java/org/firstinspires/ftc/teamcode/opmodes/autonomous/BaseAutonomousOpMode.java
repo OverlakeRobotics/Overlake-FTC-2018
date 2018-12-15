@@ -76,7 +76,7 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     int RED_TRGGER_VALUE = 12;
     int BLUE_TRIGGER_VALUE = 12;
 
-    public BaseAutonomousOpMode(String opModeName)
+    public BaseAutonomousOpMode()
     {
         //config = new ConfigParser(opModeName + ".omc");
         config = new ConfigParser("Autonomous.omc");

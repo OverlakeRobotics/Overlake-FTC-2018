@@ -19,14 +19,13 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
 
     public EducayshunOpMode()
     {
-        super("EducayshunOpMode");
 
         testConfigParser = new ConfigParser("Education.omc");
 
     }
 
     @Override
-    public void runOpMode()
+    public void run()
     {
 
         telem("About to initialize systems.", 0.25);

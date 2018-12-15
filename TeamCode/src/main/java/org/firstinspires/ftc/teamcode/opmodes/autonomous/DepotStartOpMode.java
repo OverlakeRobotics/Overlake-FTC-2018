@@ -4,20 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
 
-@Autonomous(name = "DepotStartOpMode", group = "Bot")
+@Autonomous(name = "Depot Start", group = "Competition")
 public class DepotStartOpMode extends BaseAutonomousOpMode {
     private final String TAG = "DepotStartOpMode";
 
-
-    public DepotStartOpMode() {
-        super("DepotStartOpMode");
-
-
-
-    }
-
     @Override
-    public void runOpMode() {
+    public void run() {
 
         telem("About to initialize systems.", 0.25);
         this.initSystems();
