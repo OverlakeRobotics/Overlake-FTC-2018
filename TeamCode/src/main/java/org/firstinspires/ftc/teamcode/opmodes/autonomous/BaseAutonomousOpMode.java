@@ -66,6 +66,9 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     public int depDepappraochIn; // depot(OpMode) depot approach inches
     public double depWallHeading;
     public int depToCratIn;
+    public double depApproachDeg0; // -90
+    public double depApproachDeg1; // 45
+    public double depToWallHeading; // 160
 
     public double toWallPow;
     public double autonoPower;
@@ -110,6 +113,9 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         depDepappraochIn = config.getInt("depDepApproachIn");
         depWallHeading = config.getDouble("depWallHeading");
         depToCratIn = config.getInt("depToCratIn");
+        depApproachDeg0 = config.getDouble("depApproachDeg0");
+        depApproachDeg1 = config.getDouble("depApproachDeg1");
+        depToWallHeading = config.getDouble("depToWallHeading");
 
         toWallPow = config.getDouble("ToWallPow");
         autonoPower = config.getDouble("autonopower");
@@ -153,9 +159,8 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         arm.toggleRamping();
         arm.runMotors(ArmDirection.DOWN);
         arm.releaseArmPin();
-        sleep(500);
+        sleep(600);
         arm.stop();
-        sleep(1000);
         driveSystem.mecanumDriveXY(1, 0);
         sleep(250);
         driveSystem.mecanumDriveXY(0, -0.3);
@@ -181,7 +186,6 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         driveSystem.mecanumDriveXY(0,0);
         tensorFlow.activate();
         lookForGoldMineral();
-        driveSystem.driveToPositionInches(18, -1);
         tensorFlow.shutDown();
     }
 
@@ -200,6 +204,8 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
         while (shouldLookForGoldMineral()) {
             List<Recognition> updatedRecognitions = tensorFlow.getUpdatedRecognitions();
             if (shouldHandleUpdatedRecognitions(updatedRecognitions)) {
+                telemetry.addLine("Looking for recognition");
+                telemetry.update();
                 handleUpdatedRecognitions(updatedRecognitions);
             }
         }
@@ -216,6 +222,8 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     private void handleUpdatedRecognitions(List<Recognition> updatedRecognitions) {
         int goldMineralX = getGoldMineralX(updatedRecognitions);
         if (!hasFoundGoldMineral(goldMineralX)) {
+            telemetry.addLine("Has not found gold");
+            telemetry.update();
             turnAndSearch();
         } else if (hasFoundGoldMineral(goldMineralX)) {
             driveToGoldMineral();
@@ -234,9 +242,13 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
 
     private void turnAndSearch() {
         if (!hasTurned) {
+            telemetry.addLine("Has not turned, turning 33");
+            telemetry.update();
             hasTurned = true;
             driveSystem.turn(33, 1);
         } else if (!doneSearching) {
+            telemetry.addLine("Not done searching, turn -75");
+            telemetry.update();
             driveSystem.turn(-75, 1);
             doneSearching = true;
             driveToGoldMineral();
@@ -244,6 +256,8 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     }
 
     private void driveToGoldMineral() {
+        telemetry.addLine("Driving to gold mineral");
+        telemetry.update();
         driveSystem.turn(-90, 1);
         driveSystem.driveToPositionInches(32, 1);
         hasDriven = true;
@@ -261,10 +275,22 @@ public abstract class BaseAutonomousOpMode extends BaseLinearOpMode
     }
 
     private boolean isOutOfTime() {
-        boolean isOutOfTime = time.seconds() > 2;
-        if (time.seconds() > 2) {
+        boolean isOutOfTime = time.seconds() > 1;
+        if (time.seconds() > 1) {
             time = new ElapsedTime();
         }
         return isOutOfTime;
+    }
+
+    public int getCubePos() {
+        int pos = 0;
+        if ((driveSystem.initialHeading - imuSystem.getHeading()) < -100) {
+            pos = 0;
+        } else if ((driveSystem.initialHeading - imuSystem.getHeading()) > -80) {
+            pos = 2;
+        } else {
+            pos = 1;
+        }
+        return pos;
     }
 }
