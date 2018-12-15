@@ -43,7 +43,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
         /////distanceSystem.getCloseToWall(18, 0.4);
 
 
-        driveSystem.motorFrontLeft.setPower(1);
+        /*driveSystem.motorFrontLeft.setPower(1);
         sleep(1000);
         driveSystem.motorFrontLeft.setPower(0);
         sleep(1000);
@@ -58,7 +58,7 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
         driveSystem.motorBackLeft.setPower(1);
         sleep(1000);
         driveSystem.motorBackLeft.setPower(0);
-        sleep(1000);
+        sleep(1000);*/
             /*distanceSystem.getCloseToWall(7, -0.7);
 >>>>>>> master
 
@@ -166,6 +166,10 @@ import org.firstinspires.ftc.teamcode.systems.drive.MecanumDriveSystem;
                 {
                     driveSystem.mecanumDriveXY(-0.707, -0.707);
                     sleep(10000);
+                } else if (zone == 15) {
+                    sample();
+                } else if (zone == 16) {
+                    distanceSystem.strafeTowardWallPolar(inFromWall, cratApproachDeg1, cratToWallHeading, autonoPower);
                 }
 
 

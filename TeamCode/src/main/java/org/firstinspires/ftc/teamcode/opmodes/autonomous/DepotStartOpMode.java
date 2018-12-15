@@ -28,18 +28,24 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
         ////
         // tensor flow
 
+        //driveSystem.mecanumDriveXY(35.1563665,-90.0525999);
+
         delatch();
         sample();
-        distanceSystem.strafeTowardWallPolar(inFromWall, depApproachDeg0, depToWallHeading, autonoPower);
-
-
-
+        int cubePos = getCubePos();
+        telem( "cube pos: " + cubePos, 2);
+        if (cubePos == 0) {
+            driveSystem.turnAbsolute((-90 +  depApproachDeg0), autonoPower);
+        } else if (cubePos == 2) {
+            driveSystem.turnAbsolute((-90 - depApproachDeg0), autonoPower);
+        }
         parkInDepot(autonoPower, colorSystem);
+        markerSystem.place();
+        distanceSystem.strafeTowardWallPolar(inFromWall, depApproachDeg1, depToWallHeading, autonoPower);
         markerSystem.reset();
-        sleep(400);
-        distanceSystem.strafeTowardWall(depDepappraochIn, depWallHeading, autonoPower);
-        distanceSystem.driveAlongWallInches(depToCratIn, 1, 3, autonoPower, true);
-        parkOnCrator(autonoPower, CRITICAL_ANGLE, CRITICAL_ANGLE);
+        driveSystem.driveToPositionInches(70, autonoPower, false);
+        driveSystem.turnAbsolute(87, 1);
+        runSlideOut();
 
         stop();
     }
