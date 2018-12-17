@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleOp;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -49,7 +49,7 @@ public class TeleOpMode extends BaseOpMode
     public void initButton() {
         telemetry.addData("buttons", "initialize");
         telemetry.update();
-        slideSystem.setOrigin(slideSystem.EncoderTop - slideSystem.getPosition());
+        slideSystem.setOrigin(slideSystem.getPosition() - slideSystem.EncoderTop);
         addWinchButton();
         addRotateButton();
         addFlailButton();
@@ -57,38 +57,6 @@ public class TeleOpMode extends BaseOpMode
     }
 
     private void addWinchButton() {
-        controller1.rightTrigger.pressedHandler = new Handler()
-        {
-            @Override
-            public void invoke() throws Exception
-            {
-                slideSystem.setState(SlideState.WINCHING_TO_TOP);
-            }
-        };
-        controller1.rightTrigger.releasedHandler = new Handler()
-        {
-            @Override
-            public void invoke() throws Exception
-            {
-                slideSystem.setState(SlideState.IDLE);
-            }
-        };
-        controller1.leftTrigger.pressedHandler = new Handler()
-        {
-            @Override
-            public void invoke() throws Exception
-            {
-                slideSystem.setState(SlideState.WINCHING_TO_BOTTOM);
-            }
-        };
-        controller1.leftTrigger.releasedHandler = new Handler()
-        {
-            @Override
-            public void invoke() throws Exception
-            {
-                slideSystem.setState(SlideState.IDLE);
-            }
-        };
         controller2.rightTrigger.pressedHandler = new Handler()
         {
             @Override
@@ -254,16 +222,48 @@ public class TeleOpMode extends BaseOpMode
                 flail.stop();
             }
         };
+        controller2.rightBumper.pressedHandler = new Handler()
+        {
+            @Override
+            public void invoke() throws Exception
+            {
+                flail.runForward();
+            }
+        };
+        controller2.rightBumper.releasedHandler = new Handler()
+        {
+            @Override
+            public void invoke() throws Exception
+            {
+                flail.stop();
+            }
+        };
+        controller2.rightBumperShifted.pressedHandler = new Handler()
+        {
+            @Override
+            public void invoke() throws Exception
+            {
+                flail.runBackward();
+            }
+        };
+        controller2.rightBumperShifted.releasedHandler = new Handler()
+        {
+            @Override
+            public void invoke() throws Exception
+            {
+                flail.stop();
+            }
+        };
     }
 
     private void addSlowDriveButton() {
-        controller1.leftStickButton.pressedHandler = new Handler() {
+        controller1.leftTrigger.pressedHandler = new Handler() {
             @Override
             public void invoke() throws Exception {
                 slowDrive = true;
             }
         };
-        controller1.leftStickButton.releasedHandler = new Handler() {
+        controller1.leftTrigger.releasedHandler = new Handler() {
             @Override
             public void invoke() throws Exception {
                 slowDrive = false;

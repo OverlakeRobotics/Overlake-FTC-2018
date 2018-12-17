@@ -222,7 +222,7 @@ public class ArmSystem extends System {
     }
 
     public boolean isCollapsed() {
-        return 1.1 >= potentiometer.getVoltage();
+        return 1.5 >= potentiometer.getVoltage();
     }
 
     public boolean wheelsOnGround() {

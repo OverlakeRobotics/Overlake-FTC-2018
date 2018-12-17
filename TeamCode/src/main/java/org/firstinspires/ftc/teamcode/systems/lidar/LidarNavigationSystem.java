@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.systems.lidar;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -186,12 +187,16 @@ public class LidarNavigationSystem extends System {
     public void getCloseToWall(double targetDistanceFromWall, double power) {
         driveSystem.setPower(power);
 
-        while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
+        while (isGettingCloseToWall(targetDistanceFromWall)) {
             driveSystem.setPower(power);
             log.info("LidarNavigationSystem", "distance 1: " + getDistance1());
             log.info("LidarNavigationSystem", "distance 2: " + getDistance2());
         }
         driveSystem.setPower(0);
+    }
+
+    public boolean isGettingCloseToWall(double targetDistanceFromWall) {
+        return (getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall);
     }
 
     public void strafeTowardWallPolar(double targetDistanceFromWall, double wallHeading, double driveHeading,
@@ -201,11 +206,8 @@ public class LidarNavigationSystem extends System {
         driveSystem.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         driveSystem.mecanumDrivePolar(driveHeading, power);
 
-        while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
+        while (isGettingCloseToWall(targetDistanceFromWall)) {
             driveSystem.mecanumDrivePolar(driveHeading, power);
-//            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
-//            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
-//            telemetry.write();
         }
         driveSystem.setPower(0);
     }
@@ -215,11 +217,8 @@ public class LidarNavigationSystem extends System {
         driveSystem.setDirection(MecanumDriveSystem.MecanumDriveDirection.STRAFE_LEFT);
         driveSystem.setPower(power);
 
-        while ((getDistance2() > targetDistanceFromWall) && (getDistance1() > targetDistanceFromWall)) {
+        while (isGettingCloseToWall(targetDistanceFromWall)) {
             driveSystem.setPower(power);
-//            telemetry.log("LidarNavigationSystem", "distance 1: " + getDistance1());
-//            telemetry.log("LidarNavigationSystem", "distance 2: " + getDistance2());
-//            telemetry.write();
         }
         driveSystem.setPower(0);
     }

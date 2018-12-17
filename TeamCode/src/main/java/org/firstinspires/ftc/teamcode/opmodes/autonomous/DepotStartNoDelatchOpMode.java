@@ -2,15 +2,12 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.systems.drive.DriveSystem4Wheel;
-
-@Autonomous(name = "Depot Start", group = "Competition")
-public class DepotStartOpMode extends BaseAutonomousOpMode {
-    private final String TAG = "DepotStartOpMode";
-
+@Autonomous(name = "Depot Start ~!NO DE-LATCH!~", group = "Competition")
+public class DepotStartNoDelatchOpMode extends BaseAutonomousOpMode
+{
     @Override
-    public void run() {
-
+    public void run()
+    {
         telem("About to initialize systems.", 0.25);
         this.initSystems();
         telem("Initialized all systems. Ready." + ("" + distanceSystem), 0.25);
@@ -22,7 +19,6 @@ public class DepotStartOpMode extends BaseAutonomousOpMode {
 
         //driveSystem.mecanumDriveXY(35.1563665,-90.0525999);
 
-        delatch();
         sample();
         int cubePos = getCubePos();
         if (cubePos == 0) {

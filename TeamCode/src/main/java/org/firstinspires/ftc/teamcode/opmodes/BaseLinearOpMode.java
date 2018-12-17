@@ -3,15 +3,18 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.systems.logging.ILogger;
 import org.firstinspires.ftc.teamcode.systems.logging.RobotHubLogger;
 
 public abstract class BaseLinearOpMode extends LinearOpMode implements IBaseOpMode
 {
-    ILogger logger;
+    public ILogger logger;
+    public Telemetry telemetry;
 
     public BaseLinearOpMode() {
         logger = new RobotHubLogger();
+        this.telemetry = super.telemetry;
     }
 
     public ILogger getLogger() {
@@ -25,6 +28,10 @@ public abstract class BaseLinearOpMode extends LinearOpMode implements IBaseOpMo
     public void runOpMode() {
         run();
         logger.close();
+    }
+
+    public Telemetry getTelemetry() {
+        return this.telemetry;
     }
 
     public abstract void run();

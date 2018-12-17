@@ -83,15 +83,7 @@ public class SlideSystem extends System
     public void slideUp()
     {
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (!isAtTop())
-        {
-            //winch.setPower(rampTop.scaleX(winch.getCurrentPosition()));
-            winch.setPower(MaxWinchPower);
-        }
-        else
-        {
-            winch.setPower(0.0);
-        }
+        winch.setPower(MaxWinchPower);
     }
 
     /**
@@ -108,15 +100,7 @@ public class SlideSystem extends System
     public void slideDown()
     {
         winch.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (!isAtBottom())
-        {
-            //winch.setPower(-rampBottom.scaleX(winch.getCurrentPosition()));
-            winch.setPower(-MaxWinchPower);
-        }
-        else
-        {
-            winch.setPower(0);
-        }
+        winch.setPower(-MaxWinchPower);
     }
 
     /**
