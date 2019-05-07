@@ -4,6 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+/**
+ * This class is mostly used by MeccanumDriveSystem to avoid redundancy  - most methods simply take
+ * a value and assign it to all four motors in some way or anohter.
+ */
 public class DriveSystem4Wheel extends System
 {
 
@@ -12,7 +16,11 @@ public class DriveSystem4Wheel extends System
     public DcMotor motorBackLeft;
     public DcMotor motorBackRight;
 
-    public DriveSystem4Wheel(OpMode opMode, String systemName) {
+    /**
+     * Constructs a new DriveSystem4Wheel object.
+     * @param opMode The OpMode to be used for constructing.
+     */
+    public DriveSystem4Wheel(OpMode opMode) {
         super(opMode, "DriveSystem4Wheel");
 
         this.motorFrontLeft = hardwareMap.dcMotor.get("motorFL");
@@ -35,13 +43,25 @@ public class DriveSystem4Wheel extends System
         setPower(0);
     }
 
-    public void setPower(double power) {
+    /**
+     * Sets the power of each motor.
+     * Precondition: -1 < power < 1.
+     * @param power The level of power for each motor - should be between -1 and 1.
+     */
+    public void setPower(double power) throws IllegalArgumentException {
+        if (power < -1 || power > 1) {
+            throw new IllegalArgumentException();
+        }
         this.motorFrontLeft.setPower(power);
         this.motorFrontRight.setPower(power);
         this.motorBackLeft.setPower(power);
         this.motorBackRight.setPower(power);
     }
 
+    /**
+     * Returns true if any motors are busy.
+     * @return
+     */
     public boolean anyMotorsBusy()
     {
         return motorFrontLeft.isBusy() ||
@@ -50,6 +70,10 @@ public class DriveSystem4Wheel extends System
                 motorBackRight.isBusy();
     }
 
+    /**
+     * Sets the target postition in ticks.
+     * @param ticks The number of ticks.
+     */
     public void setTargetPosition(int ticks)
     {
         motorBackLeft.setTargetPosition(motorBackLeft.getCurrentPosition() + ticks);
@@ -58,6 +82,10 @@ public class DriveSystem4Wheel extends System
         motorFrontRight.setTargetPosition(motorFrontRight.getCurrentPosition() + ticks);
     }
 
+    /**
+     * Sets the mode of all motors to the given RunMode.
+     * @param runMode
+     */
     public void setRunMode(DcMotor.RunMode runMode)
     {
         // lick left kneecap daddy pimple
@@ -67,37 +95,37 @@ public class DriveSystem4Wheel extends System
         motorBackRight.setMode(runMode);
     }
 
-    public void tankDrive(double leftPower, double rightPower) {
-        this.motorFrontLeft.setPower(-leftPower);
-        this.motorBackLeft.setPower(leftPower);
-        this.motorFrontRight.setPower(rightPower);
-        this.motorBackRight.setPower(-rightPower);
-    }
-
+    /**
+     * Sets direction of robot using DriveDirection enum.
+     * @param direction The direction of robot. Use DriveDirection.FORWARD, DriveDirection.REVERSE,
+     *                  or DriveDirection.ALL_FORWARD.
+     */
     public void setDirection(DriveDirection direction) {
+        DcMotorSimple.Direction forward = DcMotorSimple.Direction.FORWARD; // Avoid Redundancy
+        DcMotorSimple.Direction reverse = DcMotorSimple.Direction.REVERSE;
         switch (direction){
             case FORWARD:
-                motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorFrontRight.setDirection(reverse);
+                motorFrontLeft.setDirection(reverse);
+                motorBackRight.setDirection(forward);
+                motorBackLeft.setDirection(forward);
                 break;
-            case BACKWARD:
-                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+            case REVERSE:
+                motorFrontRight.setDirection(forward);
+                motorFrontLeft.setDirection(forward);
+                motorBackRight.setDirection(reverse);
+                motorBackLeft.setDirection(reverse);
                 break;
             case ALL_FORWARD:
-                motorBackRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorFrontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorBackLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-                motorFrontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+                motorBackRight.setDirection(forward);
+                motorFrontRight.setDirection(forward);
+                motorBackLeft.setDirection(forward);
+                motorFrontLeft.setDirection(forward);
                 break;
         }
     }
 
     public enum DriveDirection {
-        FORWARD, BACKWARD, ALL_FORWARD;
+        FORWARD, REVERSE, ALL_FORWARD;
     }
 }

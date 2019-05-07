@@ -33,10 +33,10 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
 
     /**
      * Constructs a new MecanumDriveSystem object.
-     * @param opMode
+     * @param opMode The opMode to be used
      */
     public MecanumDriveSystem(OpMode opMode) {
-        super(opMode, "MecanumDrive");
+        super(opMode);
 
         //this.config = new ConfigParser("Testy.omc");
         TICKS_IN_INCH = 69;
@@ -349,7 +349,13 @@ public class MecanumDriveSystem extends DriveSystem4Wheel
             telemetry.log("MecanumDriveSystem","distance left: " + Math.abs(targetHeading - heading));
             telemetry.write();
 
-            tankDrive(power, -power);
+            // Pretty sure these values are correct with all the - sings but they might be wrong so
+            // look here if the robot is turning weirdly. Used to be a separate method for these
+            // four lines but we decided that was dumb so now it's here.
+            this.motorFrontLeft.setPower(-power);
+            this.motorBackLeft.setPower(power);
+            this.motorFrontRight.setPower(-power);
+            this.motorBackRight.setPower(power);
             heading = -imuSystem.getHeading();
         }
         this.setPower(0);
